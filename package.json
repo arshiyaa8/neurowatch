@@ -1,0 +1,27 @@
+{
+  "name": "neurowatch-ai",
+  "version": "2.0.0",
+  "description": "NeuroWatch AI - BE-FAST Bystander Stroke Warning System with AI Bot, Emergency Dispatch & Dual Hospital-Patient Portal",
+  "main": "backend/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "sqlite3": "^5.1.7",
+    "multer": "^1.4.5-lts.1",
+    "ws": "^8.17.0"
+  },
+  "keywords": [
+    "stroke-screening",
+    "be-fast",
+    "emergency-dispatch",
+    "tele-neurology",
+    "ai-health-bot"
+  ],
+  "author": "NeuroWatch AI Team",
+  "license": "MIT"
+}

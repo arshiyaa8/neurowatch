@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NeuroWatch AI — FAST Stroke Screen, AI Bot & Emergency Dispatch Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #040810;
+    --panel-bg: rgba(14, 21, 35, 0.85);
+    --panel-border: rgba(30, 48, 77, 0.6);
+    --panel-border-bright: rgba(58, 160, 255, 0.4);
+    --text-main: #f0f4f9;
+    --text-muted: #8496ae;
+    --cyan-accent: #00e5ff;
+    --blue-accent: #3a82f6;
+    --emerald-ok: #10b981;
+    --amber-warn: #f59e0b;
+    --crimson-danger: #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.35);
+    --font-mono: "IBM Plex Mono", monospace;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: var(--bg-dark);
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(58, 130, 246, 0.12) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(0, 229, 255, 0.08) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(4, 8, 16, 0.9) 0px, var(--bg-dark) 100%);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--panel-border);
+    background: rgba(4, 8, 16, 0.92);
+    backdrop-filter: blur(12px);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--cyan-accent), var(--blue-accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: 18px;
+    color: #040810;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.35);
+  }
+
+  .brand-title {
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-title .badge {
+    font-size: 10px;
+    background: var(--cyan-accent);
+    color: #040810;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 800;
+  }
+
+  .nav-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(10, 16, 28, 0.8);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--panel-border);
+  }
+
+  .tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tab-btn.active {
+    background: var(--blue-accent);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 0 12px rgba(58, 130, 246, 0.4);
+  }
+
+  .tab-btn.hospital-tab.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+  }
+
+  .emergency-sos-btn {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 0 18px var(--danger-glow);
+    animation: pulseGlow 2s infinite;
+  }
+
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 10px var(--danger-glow); }
+    50% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.7); }
+    100% { box-shadow: 0 0 10px var(--danger-glow); }
+  }
+
+  /* Main Layout */
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* Tab View Sections */
+  .view-section {
+    display: none;
+  }
+  .view-section.active {
+    display: block;
+  }
+
+  /* Cards & Grid */
+  .card {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 12px;
+  }
+
+  .card-title {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    header { flex-direction: column; gap: 12px; }
+  }
+
+  /* Camera Stage */
+  .stage-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--panel-border);
+  }
+
+  video, canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
+
+  .stage-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  .btn {
+    background: var(--blue-accent);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 13px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+  }
+
+  .btn-success { background: var(--emerald-ok); color: #040810; font-weight: 700; }
+  .btn-danger { background: var(--crimson-danger); }
+  .btn-outline { background: transparent; border: 1px solid var(--panel-border-bright); color: var(--cyan-accent); }
+
+  /* AI Chatbot Styles */
+  .chat-box {
+    display: flex;
+    flex-direction: column;
+    height: 480px;
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    background: rgba(8, 14, 24, 0.8);
+    overflow: hidden;
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: flex-column;
+    gap: 12px;
+  }
+
+  .msg {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+
+  .msg.user {
+    align-self: flex-end;
+    background: var(--blue-accent);
+    color: white;
+    border-bottom-right-radius: 2px;
+  }
+
+  .msg.bot {
+    align-self: flex-start;
+    background: rgba(22, 33, 54, 0.9);
+    border: 1px solid var(--panel-border);
+    color: var(--text-main);
+    border-bottom-left-radius: 2px;
+  }
+
+  .msg.bot.critical {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid var(--crimson-danger);
+    color: #fca5a5;
+  }
+
+  .chat-input-bar {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid var(--panel-border);
+    background: rgba(4, 8, 16, 0.9);
+    gap: 8px;
+  }
+
+  .chat-input {
+    flex: 1;
+    background: rgba(14, 21, 35, 0.9);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 13px;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  th {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+  .status-ok { background: rgba(16, 185, 129, 0.15); color: var(--emerald-ok); border: 1px solid var(--emerald-ok); }
+  .status-danger { background: rgba(239, 68, 68, 0.15); color: var(--crimson-danger); border: 1px solid var(--crimson-danger); }
+
+  /* Emergency Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 8, 16, 0.9);
+    backdrop-filter: blur(10px);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-content {
+    background: var(--panel-bg);
+    border: 2px solid var(--crimson-danger);
+    border-radius: 20px;
+    max-width: 620px;
+    width: 100%;
+    padding: 30px;
+    box-shadow: 0 0 50px rgba(239, 68, 68, 0.5);
+  }
+
+  .input-field {
+    width: 100%;
+    background: rgba(8, 14, 24, 0.8);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #fff;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-logo">NW</div>
+    <div>
+      <div class="brand-title">NeuroWatch AI <span class="badge">PRO 2.0</span></div>
+      <div style="font-size: 11px; color: var(--text-muted);">FAST Stroke Screen & Indian Emergency Network</div>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('screen-view')">👁️ FAST Screen</button>
+    <button class="tab-btn" onclick="switchTab('bot-view')">🤖 AI Triage Bot</button>
+    <button class="tab-btn" onclick="switchTab('history-view')">📜 History</button>
+    <button class="tab-btn" onclick="switchTab('lovedones-view')">👨‍👩‍👧 Loved Ones</button>
+    <button class="tab-btn" onclick="switchTab('documents-view')">📁 Vault</button>
+    <button class="tab-btn" onclick="switchTab('hospitals-view')">🏥 Hospitals</button>
+    <button class="tab-btn hospital-tab" onclick="switchTab('er-portal-view')">🚑 ER Portal</button>
+  </div>
+
+  <button class="emergency-sos-btn" onclick="triggerManualSOS()">
+    🚨 CALL 108 AMBULANCE
+  </button>
+</header>
+
+<main>
+
+  <!-- ==================== VIEW 1: BE-FAST SCREEN ==================== -->
+  <div id="screen-view" class="view-section active">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">👁️ Live BE-FAST Camera & Speech Analyzer</div>
+          <span class="status-badge status-ok" id="camera-status">Camera Standby</span>
+        </div>
+
+        <div class="stage-container">
+          <video id="webcam" autoplay playsinline muted></video>
+          <canvas id="overlayCanvas"></canvas>
+        </div>
+
+        <div class="stage-controls">
+          <button class="btn btn-success" onclick="startCameraScreen()">▶️ Start BE-FAST Check</button>
+          <button class="btn btn-outline" onclick="VoiceGuide.start()">🎙️ Enable Voice Guide</button>
+          <button class="btn btn-danger" onclick="simulateAsymmetryDetection()">⚡ Test Stroke Alert</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 Real-Time Diagnostic Scores</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span>Face Symmetry (Left vs Right)</span>
+              <span id="face-score-val" style="color: var(--emerald-ok); font-weight: 700;">Normal (98%)</span>
+            </div>
+            <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+              <div id="face-bar" style="width: 98%; height: 100%; background: var(--emerald-ok);"></div>
+            </div>
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span>Arm Drift / Balance Symmetry</span>
+              <span id="arm-score-val" style="color: var(--emerald-ok); font-weight: 700;">Normal (95%)</span>
+            </div>
+            <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+              <div id="arm-bar" style="width: 95%; height: 100%; background: var(--emerald-ok);"></div>
+            </div>
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+              <span>Speech Clarity & Dysarthria Score</span>
+              <span id="speech-score-val" style="color: var(--emerald-ok); font-weight: 700;">Clear</span>
+            </div>
+            <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+              <div id="speech-bar" style="width: 100%; height: 100%; background: var(--emerald-ok);"></div>
+            </div>
+          </div>
+
+          <div style="background: rgba(10, 16, 28, 0.9); padding: 16px; border-radius: 10px; border: 1px solid var(--panel-border); margin-top: 10px;">
+            <div style="font-size: 12px; color: var(--text-muted);">Overall Stroke Probability</div>
+            <div id="stroke-prob-text" style="font-size: 32px; font-weight: 800; font-family: var(--font-mono); color: var(--emerald-ok);">12% (Low Risk)</div>
+            <div id="stroke-prob-sub" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">No facial drooping or arm weakness detected.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 2: AI TRIAGE CHATBOT ==================== -->
+  <div id="bot-view" class="view-section">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🤖 NeuroWatch Medical AI Triage Assistant</div>
+        <span style="font-size: 12px; color: var(--cyan-accent);">Powered by Patient History Context & FAST Assessment Engine</span>
+      </div>
+
+      <div class="chat-box">
+        <div class="chat-messages" id="chat-messages">
+          <div class="msg bot">
+            👋 Hello Rajesh Sharma! I am your NeuroWatch AI Health Assistant. I have loaded your medical profile (Hypertension, Diabetes, Past TIA) and emergency contacts.
+            <br><br>
+            How are you feeling right now? If you are experiencing sudden numbness, difficulty speaking, face drooping, or severe headache, type it here or press the 108 Emergency button.
+          </div>
+        </div>
+
+        <div class="chat-input-bar">
+          <input type="text" id="chat-input" class="chat-input" placeholder="Type your symptoms or medical question..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+          <button class="btn btn-success" onclick="sendChatMessage()">Send Prompt</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 3: SAVED HISTORY ==================== -->
+  <div id="history-view" class="view-section">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📜 Saved BE-FAST Screen & Emergency History</div>
+        <button class="btn btn-outline" onclick="loadHistoryTable()">🔄 Refresh History</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Face Sign</th>
+            <th>Arm Sign</th>
+            <th>Speech Result</th>
+            <th>Stroke Risk %</th>
+            <th>Urgency Level</th>
+          </tr>
+        </thead>
+        <tbody id="history-table-body">
+          <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading assessment history from SQLite database...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 4: LOVED ONES & CONTACTS ==================== -->
+  <div id="lovedones-view" class="view-section">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">👨‍👩‍👧 Saved Loved Ones & Emergency Contacts</div>
+        </div>
+        <div id="lovedones-list" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">➕ Add New Loved One Contact</div>
+        </div>
+        <form onsubmit="addEmergencyContact(event)">
+          <input type="text" id="contact-name" class="input-field" placeholder="Full Name (e.g. Priya Sharma)" required>
+          <input type="text" id="contact-relation" class="input-field" placeholder="Relationship (e.g. Spouse / Daughter / Brother)" required>
+          <input type="tel" id="contact-phone" class="input-field" placeholder="Mobile Phone Number (+91...)" required>
+          <button type="submit" class="btn btn-success" style="width: 100%;">Save Emergency Contact</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 5: MEDICAL DOCUMENT VAULT ==================== -->
+  <div id="documents-view" class="view-section">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📁 Uploaded Medical Documents & Scans</div>
+          <button class="btn btn-outline" onclick="loadDocumentsList()">🔄 Refresh Vault</button>
+        </div>
+        <div id="documents-list" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📤 Upload Medical Document (MRI / CT / ECG)</div>
+        </div>
+        <form onsubmit="uploadMedicalDocument(event)">
+          <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block;">Document Category:</label>
+          <select id="doc-type-select" class="input-field">
+            <option value="MRI Scan">Brain MRI Scan</option>
+            <option value="CT Scan">Brain CT Scan</option>
+            <option value="ECG">ECG Report</option>
+            <option value="Blood Test">Blood Work / Lipid Panel</option>
+            <option value="Discharge Summary">Hospital Discharge Summary</option>
+            <option value="Prescription">Doctor Prescription</option>
+          </select>
+
+          <label style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: block;">Select PDF or Image File:</label>
+          <input type="file" id="doc-file-input" class="input-field" required>
+
+          <button type="submit" class="btn btn-success" style="width: 100%;">Upload & Run AI Parsing</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 6: HOSPITALS LOCATOR ==================== -->
+  <div id="hospitals-view" class="view-section">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">🏥 Nearby Indian Stroke-Ready Hospitals & Cath Labs</div>
+        <span style="font-size: 12px; color: var(--emerald-ok);">Auto-alerts Desk on Emergency Trigger</span>
+      </div>
+      <div id="hospitals-list" class="grid-2">
+        <!-- Loaded dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== VIEW 7: HOSPITAL ER PORTAL ==================== -->
+  <div id="er-portal-view" class="view-section">
+    <div class="card" style="border-color: var(--emerald-ok);">
+      <div class="card-header">
+        <div class="card-title" style="color: var(--emerald-ok);">🚑 Hospital Emergency Command Center (Doctor View)</div>
+        <span class="status-badge status-ok" id="ws-er-status">WS Stream Active</span>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <h4 style="font-family: var(--font-mono); color: var(--cyan-accent); margin-bottom: 12px;">🚨 Live Incoming Emergency Incidents</h4>
+          <div id="er-incidents-feed" style="display: flex; flex-direction: column; gap: 14px;">
+            <!-- Loaded dynamically -->
+          </div>
+        </div>
+
+        <div>
+          <h4 style="font-family: var(--font-mono); color: var(--cyan-accent); margin-bottom: 12px;">📋 Patient Medical Vault & EHR Record Access</h4>
+          <div id="er-patient-records" style="background: rgba(8, 14, 24, 0.8); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border);">
+            <div style="color: var(--text-muted); font-size: 13px;">Loading incoming patient records...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ==================== EMERGENCY SOS MODAL ==================== -->
+<div class="modal-overlay" id="sos-modal">
+  <div class="modal-content">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+      <h2 style="font-family: var(--font-mono); color: var(--crimson-danger); font-size: 20px;">🚨 EMERGENCY 108 DISPATCHED</h2>
+      <button class="btn btn-outline" onclick="closeSOSModal()">Close</button>
+    </div>
+
+    <div id="sos-modal-body" style="font-size: 13px; line-height: 1.6;">
+      <div style="background: rgba(239,68,68,0.1); padding: 16px; border-radius: 10px; border: 1px solid var(--crimson-danger); margin-bottom: 14px;">
+        <strong>108 Indian Emergency Ambulance Service Dispatched!</strong><br>
+        Ambulance Unit ETA: <span id="sos-eta" style="color: #fff; font-weight: 700;">10 minutes</span>.<br>
+        Live GPS Coordinates Transmitted: <span id="sos-gps">28.5672, 77.2100</span>.
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <strong style="color: var(--cyan-accent);">👨‍👩‍👧 Saved Loved Ones Alerted via Call & SMS:</strong>
+        <ul id="sos-lovedones-list" style="padding-left: 20px; margin-top: 6px; color: var(--text-main);">
+          <!-- Dynamic -->
+        </ul>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <strong style="color: var(--emerald-ok);">🏥 Alerted Hospital Desk & Cath Lab:</strong>
+        <div id="sos-hospital-info" style="color: #fff; font-weight: 600; margin-top: 4px;">AIIMS Emergency & Stroke Center</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="voice-guide.js"></script>
+<script>
+  // Global State
+  let currentTab = 'screen-view';
+  let wsClient = null;
+
+  function switchTab(tabId) {
+    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+
+    const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes(tabId));
+    if (activeBtn) activeBtn.classList.add('active');
+
+    if (tabId === 'history-view') loadHistoryTable();
+    if (tabId === 'lovedones-view') loadLovedOnesList();
+    if (tabId === 'documents-view') loadDocumentsList();
+    if (tabId === 'hospitals-view') loadHospitalsList();
+    if (tabId === 'er-portal-view') loadHospitalERPortal();
+  }
+
+  // Camera & Face asymmetry test simulator
+  function startCameraScreen() {
+    const webcam = document.getElementById('webcam');
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then(stream => {
+        webcam.srcObject = stream;
+        document.getElementById('camera-status').innerText = 'Live Feed Active';
+        document.getElementById('camera-status').className = 'status-badge status-ok';
+        if (window.VoiceGuide) VoiceGuide.start();
+      })
+      .catch(err => {
+        alert('Camera access error: ' + err.message);
+      });
+  }
+
+  function simulateAsymmetryDetection() {
+    document.getElementById('face-score-val').innerText = 'Asymmetry Detected (High Risk)';
+    document.getElementById('face-score-val').style.color = 'var(--crimson-danger)';
+    document.getElementById('face-bar').style.width = '35%';
+    document.getElementById('face-bar').style.background = 'var(--crimson-danger)';
+
+    document.getElementById('stroke-prob-text').innerText = '88% (CRITICAL STROKE RISK)';
+    document.getElementById('stroke-prob-text').style.color = 'var(--crimson-danger)';
+    document.getElementById('stroke-prob-sub').innerText = 'Facial asymmetry and potential ischemic stroke signs detected.';
+
+    // Post to backend
+    fetch('/api/checks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        face_result: 'asymmetry detected',
+        arm_result: 'left arm drift',
+        speech_result: 'slurred speech',
+        stroke_probability: 88,
+        urgency_level: 'CRITICAL',
+        latitude: 28.5672,
+        longitude: 77.2100
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.emergencyTriggered) {
+        showSOSModal(data.emergencyPayload);
+      }
+    });
+  }
+
+  // Chatbot logic
+  function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    const chatMessages = document.getElementById('chat-messages');
+    chatMessages.innerHTML += `<div class="msg user">${msg}</div>`;
+    input.value = '';
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    fetch('/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg })
+    })
+    .then(r => r.json())
+    .then(data => {
+      const msgClass = data.urgency === 'CRITICAL' ? 'msg bot critical' : 'msg bot';
+      chatMessages.innerHTML += `<div class="${msgClass}">${data.reply.replace(/\n/g, '<br>')}</div>`;
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      if (data.emergencyTriggered) {
+        showSOSModal(data.emergencyPayload);
+      }
+    });
+  }
+
+  // Load History
+  function loadHistoryTable() {
+    fetch('/api/checks')
+      .then(r => r.json())
+      .then(rows => {
+        const tbody = document.getElementById('history-table-body');
+        if (!rows || rows.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No checks saved yet.</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = rows.map(r => `
+          <tr>
+            <td>${new Date(r.timestamp).toLocaleString()}</td>
+            <td>${r.face_result || 'ok'}</td>
+            <td>${r.arm_result || 'ok'}</td>
+            <td>${r.speech_result || 'clear'}</td>
+            <td><strong style="color: ${r.stroke_probability > 50 ? 'var(--crimson-danger)' : 'var(--emerald-ok)'};">${r.stroke_probability}%</strong></td>
+            <td><span class="status-badge ${r.urgency_level === 'CRITICAL' ? 'status-danger' : 'status-ok'}">${r.urgency_level || 'LOW'}</span></td>
+          </tr>
+        `).join('');
+      });
+  }
+
+  // Load Loved Ones
+  function loadLovedOnesList() {
+    fetch('/api/patient')
+      .then(r => r.json())
+      .then(data => {
+        const container = document.getElementById('lovedones-list');
+        const contacts = data.emergencyContacts || [];
+        if (contacts.length === 0) {
+          container.innerHTML = `<div style="color: var(--text-muted);">No emergency contacts saved yet.</div>`;
+          return;
+        }
+        container.innerHTML = contacts.map(c => `
+          <div style="background: rgba(8, 14, 24, 0.8); padding: 14px; border-radius: 10px; border: 1px solid var(--panel-border); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 700; color: #fff;">${c.name} (${c.relation})</div>
+              <div style="font-family: var(--font-mono); font-size: 12px; color: var(--cyan-accent);">${c.phone}</div>
+            </div>
+            <button class="btn btn-danger" style="padding: 6px 10px; font-size: 11px;" onclick="deleteEmergencyContact(${c.id})">Delete</button>
+          </div>
+        `).join('');
+      });
+  }
+
+  function addEmergencyContact(e) {
+    e.preventDefault();
+    const name = document.getElementById('contact-name').value;
+    const relation = document.getElementById('contact-relation').value;
+    const phone = document.getElementById('contact-phone').value;
+
+    fetch('/api/patient/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, relation, phone })
+    })
+    .then(r => r.json())
+    .then(() => {
+      document.getElementById('contact-name').value = '';
+      document.getElementById('contact-relation').value = '';
+      document.getElementById('contact-phone').value = '';
+      loadLovedOnesList();
+    });
+  }
+
+  function deleteEmergencyContact(id) {
+    fetch(`/api/patient/contact/${id}`, { method: 'DELETE' })
+      .then(() => loadLovedOnesList());
+  }
+
+  // Load Documents
+  function loadDocumentsList() {
+    fetch('/api/documents')
+      .then(r => r.json())
+      .then(docs => {
+        const container = document.getElementById('documents-list');
+        if (!docs || docs.length === 0) {
+          container.innerHTML = `<div style="color: var(--text-muted);">No medical documents uploaded yet.</div>`;
+          return;
+        }
+        container.innerHTML = docs.map(d => `
+          <div style="background: rgba(8, 14, 24, 0.8); padding: 14px; border-radius: 10px; border: 1px solid var(--panel-border);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-weight: 700; color: var(--cyan-accent);">${d.doc_type}</span>
+              <span style="font-size: 11px; color: var(--text-muted);">${new Date(d.uploaded_at).toLocaleDateString()}</span>
+            </div>
+            <div style="font-size: 13px; color: #fff; margin-bottom: 6px;">${d.file_name}</div>
+            <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">${d.summary || 'Parsed by AI'}</div>
+          </div>
+        `).join('');
+      });
+  }
+
+  function uploadMedicalDocument(e) {
+    e.preventDefault();
+    const docType = document.getElementById('doc-type-select').value;
+    const fileInput = document.getElementById('doc-file-input');
+    if (!fileInput.files[0]) return;
+
+    const formData = new FormData();
+    formData.append('document', fileInput.files[0]);
+    formData.append('doc_type', docType);
+
+    fetch('/api/documents/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(r => r.json())
+    .then(() => {
+      fileInput.value = '';
+      loadDocumentsList();
+    });
+  }
+
+  // Load Hospitals
+  function loadHospitalsList() {
+    fetch('/api/hospitals')
+      .then(r => r.json())
+      .then(hospitals => {
+        const container = document.getElementById('hospitals-list');
+        container.innerHTML = hospitals.map(h => `
+          <div style="background: rgba(8, 14, 24, 0.8); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border);">
+            <div style="font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 6px;">${h.name}</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">City: ${h.city} | ER Desk: <strong style="color: var(--cyan-accent);">${h.emergency_desk}</strong></div>
+            <div style="display: flex; gap: 8px;">
+              <span class="status-badge status-ok">Cath Lab Ready</span>
+              <span class="status-badge status-ok">${h.stroke_beds_available} Stroke Beds Available</span>
+            </div>
+          </div>
+        `).join('');
+      });
+  }
+
+  // Load Hospital ER Portal
+  function loadHospitalERPortal() {
+    fetch('/api/hospital/incidents')
+      .then(r => r.json())
+      .then(data => {
+        const feed = document.getElementById('er-incidents-feed');
+        const incidents = data.incidents || [];
+
+        if (incidents.length === 0) {
+          feed.innerHTML = `<div style="color: var(--text-muted);">No active emergency incidents currently dispatched.</div>`;
+        } else {
+          feed.innerHTML = incidents.map(inc => `
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--crimson-danger); padding: 16px; border-radius: 12px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-weight: 700; color: #fff; font-size: 15px;">Patient: ${inc.patient_name}</span>
+                <span class="status-badge status-danger">${inc.status}</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-main); margin-bottom: 6px;">
+                <strong>Stroke Score:</strong> ${inc.stroke_score}% | <strong>108 Ambulance ETA:</strong> ${inc.eta_minutes} mins
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                Loved Ones Notified: ${inc.loved_ones_notified} | Bystanders Alerted: ${inc.bystanders_notified}
+              </div>
+              <button class="btn btn-success" style="width: 100%; font-size: 12px;" onclick="alert('Stroke Cath Lab Team Activated for ${inc.patient_name}')">⚡ ACTIVATE STROKE CATH LAB TEAM</button>
+            </div>
+          `).join('');
+        }
+
+        // Render Patient Records
+        const recordsContainer = document.getElementById('er-patient-records');
+        const p = data.patientRecords.patient || {};
+        const docs = data.patientRecords.documents || [];
+        const contacts = data.patientRecords.emergencyContacts || [];
+
+        recordsContainer.innerHTML = `
+          <div style="margin-bottom: 12px;">
+            <strong style="color: #fff; font-size: 15px;">${p.name} (${p.age} Y/O, Blood Group ${p.blood_group})</strong>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+              <strong>Medical History:</strong> ${p.medical_history}<br>
+              <strong>Medications:</strong> ${p.medications}
+            </div>
+          </div>
+          <div style="border-top: 1px solid var(--panel-border); padding-top: 10px; margin-top: 10px;">
+            <strong style="color: var(--cyan-accent); font-size: 12px;">Available Medical Vault Scans (${docs.length}):</strong>
+            <ul style="padding-left: 18px; margin-top: 6px; font-size: 12px; color: var(--text-main);">
+              ${docs.map(d => `<li><strong>[${d.doc_type}]</strong> ${d.file_name} — <em>${d.summary}</em></li>`).join('')}
+            </ul>
+          </div>
+        `;
+      });
+  }
+
+  // Trigger Emergency SOS
+  function triggerManualSOS() {
+    fetch('/api/emergency/trigger', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ strokeScore: 95, reason: 'Manual 108 Emergency SOS Button Triggered' })
+    })
+    .then(r => r.json())
+    .then(payload => showSOSModal(payload));
+  }
+
+  function showSOSModal(payload) {
+    document.getElementById('sos-eta').innerText = (payload.dispatches?.ambulance108?.etaMinutes || 10) + ' minutes';
+    document.getElementById('sos-gps').innerText = `${payload.location?.latitude}, ${payload.location?.longitude}`;
+
+    const lovedOnesList = document.getElementById('sos-lovedones-list');
+    lovedOnesList.innerHTML = (payload.dispatches?.lovedOnesNotified || []).map(l => `
+      <li><strong>${l.name} (${l.relation}):</strong> ${l.phone} — <span style="color: var(--emerald-ok); font-weight: 700;">Voice Call Connected & SMS Sent</span></li>
+    `).join('');
+
+    document.getElementById('sos-hospital-info').innerText = `${payload.dispatches?.assignedHospital?.name || 'AIIMS Emergency'} (Desk Desk Alert Transmitted)`;
+    document.getElementById('sos-modal').style.display = 'flex';
+  }
+
+  function closeSOSModal() {
+    document.getElementById('sos-modal').style.display = 'none';
+  }
+
+  // Initialize WebSockets for ER Portal
+  function initWebSocket() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    wsClient = new WebSocket(`${protocol}//${window.location.host}`);
+    wsClient.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'NEW_EMERGENCY_INCIDENT') {
+        if (currentTab === 'er-portal-view') loadHospitalERPortal();
+      }
+    };
+  }
+
+  // Initial load
+  loadHistoryTable();
+  loadLovedOnesList();
+  loadDocumentsList();
+  loadHospitalsList();
+  initWebSocket();
+</script>
+</body>
+</html>

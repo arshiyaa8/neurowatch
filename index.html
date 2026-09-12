@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NeuroWatch AI Pro — Advanced BE-FAST Bystander Stroke Warning System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-dark: #040810;
+    --panel-bg: rgba(14, 21, 35, 0.75);
+    --panel-border: rgba(30, 48, 77, 0.6);
+    --panel-border-bright: rgba(58, 160, 255, 0.4);
+    --text-main: #f0f4f9;
+    --text-muted: #8496ae;
+    --cyan-accent: #00e5ff;
+    --blue-accent: #3a82f6;
+    --emerald-ok: #10b981;
+    --amber-warn: #f59e0b;
+    --crimson-danger: #ef4444;
+    --danger-glow: rgba(239, 68, 68, 0.25);
+    --font-mono: "IBM Plex Mono", monospace;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: var(--bg-dark);
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(58, 130, 246, 0.12) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(0, 229, 255, 0.08) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(4, 8, 16, 0.9) 0px, var(--bg-dark) 100%);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    padding-bottom: 60px;
+    overflow-x: hidden;
+  }
+
+  /* Header Bar */
+  header {
+    border-bottom: 1px solid var(--panel-border);
+    background: rgba(4, 8, 16, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .brand-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--cyan-accent), var(--blue-accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: 18px;
+    color: #040810;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.35);
+  }
+
+  .brand-title {
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-title .badge-pro {
+    font-size: 10px;
+    background: var(--cyan-accent);
+    color: #040810;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 800;
+  }
+
+  .brand-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .sdg-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan-accent);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    background: rgba(0, 229, 255, 0.05);
+    padding: 6px 14px;
+    border-radius: 999px;
+  }
+
+  .emergency-call-btn {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    box-shadow: 0 0 15px var(--danger-glow);
+    transition: all 0.2s ease;
+  }
+
+  .emergency-call-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.6);
+  }
+
+  /* Container */
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* Critical Warning Banner */
+  .med-disclaimer {
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #fca5a5;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .med-disclaimer icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  /* Layout Grid */
+  .app-grid {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 24px;
+  }
+
+  @media (max-width: 1024px) {
+    .app-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Video Stage Card */
+  .stage-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    overflow: hidden;
+    backdrop-filter: blur(16px);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .video-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: #000;
+    overflow: hidden;
+  }
+
+  video, canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Mirror selfie view */
+  video, canvas#overlayCanvas {
+    transform: scaleX(-1);
+  }
+
+  /* Positioning Overlay Silhouette */
+  .guide-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+  }
+
+  .guide-overlay svg {
+    width: 70%;
+    height: 70%;
+    stroke: var(--cyan-accent);
+    stroke-dasharray: 4;
+  }
+
+  /* Stage Controls Bar */
+  .stage-bar {
+    padding: 18px 24px;
+    border-top: 1px solid var(--panel-border);
+    background: rgba(10, 16, 28, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .status-tag {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--panel-border);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+
+  .status-dot.active {
+    background: var(--emerald-ok);
+    box-shadow: 0 0 10px var(--emerald-ok);
+  }
+
+  .status-dot.warn {
+    background: var(--crimson-danger);
+    box-shadow: 0 0 10px var(--crimson-danger);
+  }
+
+  .btn {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 22px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--cyan-accent), var(--blue-accent));
+    color: #040810;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(0, 229, 255, 0.25);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 6px 20px rgba(0, 229, 255, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    border: 1px solid var(--panel-border);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Diagnostics Sidebar */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .panel-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    padding: 22px;
+    backdrop-filter: blur(16px);
+  }
+
+  .panel-card h3 {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Diagnostic Check Rows */
+  .check-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .check-item {
+    background: rgba(8, 14, 26, 0.6);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: border-color 0.2s ease;
+  }
+
+  .check-item.warn-border {
+    border-color: var(--crimson-danger);
+    background: rgba(239, 68, 68, 0.05);
+  }
+
+  .check-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .check-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .check-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .metric-value {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan-accent);
+  }
+
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .badge.idle { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); }
+  .badge.ok { background: rgba(16, 185, 129, 0.15); color: var(--emerald-ok); border: 1px solid rgba(16, 185, 129, 0.3); }
+  .badge.warn { background: rgba(239, 68, 68, 0.15); color: var(--crimson-danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+  /* Audio Waveform Canvas */
+  .audio-wave-container {
+    height: 40px;
+    width: 100%;
+    background: #040810;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid var(--panel-border);
+    overflow: hidden;
+  }
+
+  #audioCanvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Progress Bar */
+  .progress-wrapper {
+    margin-top: 16px;
+  }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .progress-bar-track {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--panel-border);
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--cyan-accent), var(--blue-accent));
+    transition: width 0.1s linear;
+  }
+
+  /* Result Banner */
+  .result-card {
+    border-radius: 16px;
+    padding: 20px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-card.show { display: block; }
+
+  .result-card.danger {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1.5px solid rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 30px var(--danger-glow);
+  }
+
+  .result-card.safe {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1.5px solid rgba(16, 185, 129, 0.4);
+  }
+
+  .result-title {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .result-card.danger .result-title { color: var(--crimson-danger); }
+  .result-card.safe .result-title { color: var(--emerald-ok); }
+
+  .result-body {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-main);
+    margin-bottom: 16px;
+  }
+
+  .location-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px dashed var(--panel-border-bright);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan-accent);
+    margin-bottom: 14px;
+  }
+
+  /* EMT Handover Report Button */
+  .report-btn {
+    width: 100%;
+    background: rgba(58, 130, 246, 0.2);
+    color: var(--cyan-accent);
+    border: 1px solid rgba(0, 229, 255, 0.4);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .report-btn:hover {
+    background: rgba(0, 229, 255, 0.15);
+  }
+
+  /* Intro Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 8, 16, 0.88);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-box {
+    max-width: 560px;
+    background: #0a101d;
+    border: 1px solid var(--panel-border-bright);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  }
+
+  .modal-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--cyan-accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .modal-box h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .modal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 20px 0 28px;
+  }
+
+  .modal-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .modal-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: rgba(0, 229, 255, 0.15);
+    color: var(--cyan-accent);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .modal-text {
+    font-size: 13.5px;
+    color: #c7d4e5;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- Intro Modal -->
+<div class="modal-backdrop" id="introModal">
+  <div class="modal-box">
+    <div class="modal-tag">BE-FAST CLINICAL PROTOCOL</div>
+    <h2>Bystander Acute Stroke Screening Tool</h2>
+    <div class="modal-list">
+      <div class="modal-step">
+        <div class="modal-num">B</div>
+        <div class="modal-text"><b>Balance / Posture:</b> Checks head orientation & torso stability.</div>
+      </div>
+      <div class="modal-step">
+        <div class="modal-num">E</div>
+        <div class="modal-text"><b>Eyes:</b> Checks eyelid drooping (ptosis) and pupil position.</div>
+      </div>
+      <div class="modal-step">
+        <div class="modal-num">F</div>
+        <div class="modal-text"><b>Face Symmetry:</b> Calculates 3D head-roll compensated facial asymmetry.</div>
+      </div>
+      <div class="modal-step">
+        <div class="modal-num">A</div>
+        <div class="modal-text"><b>Arm Drift:</b> Tracks downward drift of raised arms over 8 seconds.</div>
+      </div>
+      <div class="modal-step">
+        <div class="modal-num">S</div>
+        <div class="modal-text"><b>Speech:</b> Analyzes speech clarity & word match against test phrase.</div>
+      </div>
+      <div class="modal-step">
+        <div class="modal-num">T</div>
+        <div class="modal-text"><b>Time:</b> Records exact onset timestamp for emergency dispatchers.</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="modalStartBtn" style="width:100%; padding:14px;">I Understand — Begin Protocol</button>
+  </div>
+</div>
+
+<header>
+  <div class="brand">
+    <div class="brand-logo">N</div>
+    <div>
+      <div class="brand-title">NEUROWATCH <span class="badge-pro">PRO AI</span></div>
+      <div class="brand-sub">Advanced BE-FAST Bystander Screening System</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <div class="sdg-badge">SDG 3 — GOOD HEALTH</div>
+    <a href="tel:911" class="emergency-call-btn" id="headerCallBtn">
+      <span>☎ DIAL 911 / EMERGENCY</span>
+    </a>
+  </div>
+</header>
+
+<main>
+  <div class="med-disclaimer">
+    <icon>⚠</icon>
+    <div>
+      <b>Emergency Notice:</b> This AI tool assists bystanders in verifying acute stroke indicators (BE-FAST protocol). 
+      <b>It is not a medical diagnosis device.</b> If you observe sudden weakness, confusion, or facial drooping, call emergency services immediately regardless of scan outputs.
+    </div>
+  </div>
+
+  <div class="app-grid">
+    <!-- Camera & Overlay Stage -->
+    <div class="stage-card">
+      <div class="video-container">
+        <video id="webcamVideo" autoplay playsinline muted></video>
+        <canvas id="overlayCanvas"></canvas>
+
+        <!-- Positioning Guide Overlay -->
+        <div class="guide-overlay" id="guideOverlay">
+          <svg viewBox="0 0 100 100">
+            <ellipse cx="50" cy="40" rx="18" ry="24" fill="none" stroke-width="0.8" />
+            <path d="M 20 85 Q 50 65 80 85" fill="none" stroke-width="0.8" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="stage-bar">
+        <div class="status-tag">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">Camera Ready</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="resetBtn">Reset</button>
+          <button class="btn btn-primary" id="enableCamBtn">Start Sensor Feed</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar Controls & Live Checks -->
+    <div class="sidebar">
+      <div class="panel-card">
+        <h3>
+          Live Sensor Metrics
+          <span id="locationBadge" style="font-size:10px; color:var(--cyan-accent); cursor:pointer;">GPS: Locating...</span>
+        </h3>
+
+        <div class="check-grid">
+          <!-- Balance & Eyes (BE) -->
+          <div class="check-item" id="itemBalance">
+            <div class="check-info">
+              <div class="check-title">B — Balance / Head Tilt</div>
+              <div class="check-desc">Cervical tilt & shoulder level</div>
+            </div>
+            <span class="badge idle" id="badgeBalance">idle</span>
+          </div>
+
+          <div class="check-item" id="itemEyes">
+            <div class="check-info">
+              <div class="check-title">E — Eye Movement & Ptosis</div>
+              <div class="check-desc">Eyelid aspect ratio & gaze</div>
+            </div>
+            <span class="badge idle" id="badgeEyes">idle</span>
+          </div>
+
+          <!-- Face Asymmetry -->
+          <div class="check-item" id="itemFace">
+            <div class="check-info">
+              <div class="check-title">
+                F — Facial Symmetry
+                <span class="metric-value" id="valFace"></span>
+              </div>
+              <div class="check-desc">3D roll-compensated lip corner delta</div>
+            </div>
+            <span class="badge idle" id="badgeFace">idle</span>
+          </div>
+
+          <!-- Arm Drift -->
+          <div class="check-item" id="itemArms">
+            <div class="check-info">
+              <div class="check-title">
+                A — Arm Drift
+                <span class="metric-value" id="valArm"></span>
+              </div>
+              <div class="check-desc">Downward motor drift over time</div>
+            </div>
+            <span class="badge idle" id="badgeArms">idle</span>
+          </div>
+
+          <!-- Speech -->
+          <div class="check-item" id="itemSpeech" style="flex-direction:column; align-items:stretch; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="check-info">
+                <div class="check-title">S — Speech Clarity</div>
+                <div class="check-desc">"The sky is blue in Cincinnati"</div>
+              </div>
+              <span class="badge idle" id="badgeSpeech">idle</span>
+            </div>
+            <div class="audio-wave-container">
+              <canvas id="audioCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-wrapper">
+          <div class="progress-labels">
+            <span>BE-FAST Diagnostic Sweep</span>
+            <span id="timerText">0.0s / 8.0s</span>
+          </div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="runCheckBtn" style="width:100%; margin-top:16px;" disabled>
+          Execute 8-Second Screening Sweep
+        </button>
+      </div>
+
+      <!-- Result Card -->
+      <div class="result-card" id="resultCard">
+        <div class="result-title" id="resultTitle"></div>
+        <div class="result-body" id="resultBody"></div>
+
+        <div class="location-box" id="dispatchLocationBox">
+          📍 Dispatch Location: Fetching GPS coordinates...
+        </div>
+
+        <button class="report-btn" id="exportReportBtn">
+          📄 Download EMT Handover PDF / Text Summary
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+import {
+  FaceLandmarker,
+  PoseLandmarker,
+  FilesetResolver,
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs";
+
+// DOM Elements
+const video = document.getElementById("webcamVideo");
+const canvas = document.getElementById("overlayCanvas");
+const ctx = canvas.getContext("2d");
+const enableCamBtn = document.getElementById("enableCamBtn");
+const resetBtn = document.getElementById("resetBtn");
+const runCheckBtn = document.getElementById("runCheckBtn");
+const statusDot = document.getElementById("statusDot");
+const statusText = document.getElementById("statusText");
+const introModal = document.getElementById("introModal");
+const modalStartBtn = document.getElementById("modalStartBtn");
+const progressFill = document.getElementById("progressFill");
+const timerText = document.getElementById("timerText");
+
+// Badges & Metrics
+const badgeBalance = document.getElementById("badgeBalance");
+const badgeEyes = document.getElementById("badgeEyes");
+const badgeFace = document.getElementById("badgeFace");
+const badgeArms = document.getElementById("badgeArms");
+const badgeSpeech = document.getElementById("badgeSpeech");
+const valFace = document.getElementById("valFace");
+const valArm = document.getElementById("valArm");
+const resultCard = document.getElementById("resultCard");
+const resultTitle = document.getElementById("resultTitle");
+const resultBody = document.getElementById("resultBody");
+const locationBadge = document.getElementById("locationBadge");
+const dispatchLocationBox = document.getElementById("dispatchLocationBox");
+const exportReportBtn = document.getElementById("exportReportBtn");
+
+// Audio Canvas Setup
+const audioCanvas = document.getElementById("audioCanvas");
+const audioCtx = audioCanvas.getContext("2d");
+
+// State Variables
+let faceLandmarker, poseLandmarker;
+let isCamActive = false;
+let isSampling = false;
+let sampleData = [];
+let animFrameId = null;
+let currentAddress = "GPS Coordinates Pending";
+let userLocation = null;
+
+// Speech Recognition & Web Audio API
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let speechRecognizer = null;
+let recordedTranscript = "";
+let audioContext = null;
+let analyser = null;
+let audioDataArray = null;
+
+// Config Thresholds
+const SWEEP_DURATION_MS = 8000;
+const THRESHOLD_FACE_ASYM = 0.09; // Eye-distance normalized 3D roll compensated
+const THRESHOLD_ARM_DRIFT = 0.08; // Shoulder-width normalized
+const THRESHOLD_EYE_PTOSIS = 0.06; // Eye aspect ratio delta
+const TARGET_PHRASE = "the sky is blue in cincinnati";
+
+modalStartBtn.addEventListener("click", () => {
+  introModal.style.display = "none";
+  initGeolocation();
+});
+
+// Geolocation setup
+function initGeolocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(4);
+        const lng = pos.coords.longitude.toFixed(4);
+        userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        currentAddress = `Lat: ${lat}, Lng: ${lng}`;
+        locationBadge.textContent = `GPS: ${lat}, ${lng}`;
+        dispatchLocationBox.textContent = `📍 Location for Dispatcher: Lat ${lat}, Lng ${lng} (Accurate to ${pos.coords.accuracy.toFixed(0)}m)`;
+      },
+      (err) => {
+        locationBadge.textContent = "GPS: Permission Denied";
+        dispatchLocationBox.textContent = "📍 Location: Provide landmark manually to EMTs";
+      }
+    );
+  }
+}
+
+// Setup Vision Models
+async function initMediaPipe() {
+  statusText.textContent = "Loading AI Vision Models...";
+  const visionResolver = await FilesetResolver.forVisionTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+  );
+
+  faceLandmarker = await FaceLandmarker.createFromOptions(visionResolver, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+      delegate: "GPU"
+    },
+    runningMode: "VIDEO",
+    numFaces: 1
+  });
+
+  poseLandmarker = await PoseLandmarker.createFromOptions(visionResolver, {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+      delegate: "GPU"
+    },
+    runningMode: "VIDEO",
+    numPoses: 1
+  });
+
+  statusText.textContent = "AI Ready";
+  statusDot.classList.add("active");
+}
+
+// Enable Camera & Audio Stream
+async function enableSensors() {
+  enableCamBtn.disabled = true;
+  if (!faceLandmarker) await initMediaPipe();
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: true });
+    video.srcObject = stream;
+    await new Promise((res) => (video.onloadedmetadata = res));
+    video.play();
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    audioCanvas.width = audioCanvas.offsetWidth;
+    audioCanvas.height = audioCanvas.offsetHeight;
+
+    // Init Web Audio Visualizer
+    setupAudioVisualizer(stream);
+
+    // Init Speech Recognition
+    if (SpeechRecognition) {
+      speechRecognizer = new SpeechRecognition();
+      speechRecognizer.continuous = true;
+      speechRecognizer.interimResults = true;
+      speechRecognizer.lang = "en-US";
+      speechRecognizer.onresult = (e) => {
+        let text = "";
+        for (let i = 0; i < e.results.length; i++) {
+          text += e.results[i][0].transcript + " ";
+        }
+        recordedTranscript = text;
+      };
+    }
+
+    isCamActive = true;
+    runCheckBtn.disabled = false;
+    enableCamBtn.textContent = "Feed Active";
+    statusText.textContent = "Live Feed Active";
+    statusDot.classList.add("active");
+
+    renderLoop();
+  } catch (err) {
+    console.error("Camera Error:", err);
+    statusText.textContent = "Camera/Mic Blocked";
+    statusDot.classList.add("warn");
+    enableCamBtn.disabled = false;
+  }
+}
+
+function setupAudioVisualizer(stream) {
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const source = audioContext.createMediaStreamSource(stream);
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 64;
+  source.connect(analyser);
+  audioDataArray = new Uint8Array(analyser.frequencyBinCount);
+}
+
+function drawAudioWave() {
+  if (!analyser || !audioDataArray) return;
+  analyser.getByteFrequencyData(audioDataArray);
+
+  audioCtx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
+  const barWidth = (audioCanvas.width / audioDataArray.length) * 1.5;
+  let x = 0;
+
+  for (let i = 0; i < audioDataArray.length; i++) {
+    const barHeight = (audioDataArray[i] / 255) * audioCanvas.height;
+    audioCtx.fillStyle = "rgba(0, 229, 255, 0.7)";
+    audioCtx.fillRect(x, audioCanvas.height - barHeight, barWidth - 1, barHeight);
+    x += barWidth;
+  }
+}
+
+// Distance helper
+function distance(p1, p2) {
+  return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+}
+
+// Advanced Analysis with Head Roll Compensation
+function analyzeFrame(faceRes, poseRes) {
+  let faceAsym = null;
+  let eyePtosisDelta = null;
+  let headTilt = null;
+  let armDrift = null;
+  let armsRaised = false;
+
+  if (faceRes && faceRes.faceLandmarks && faceRes.faceLandmarks.length > 0) {
+    const lm = faceRes.faceLandmarks[0];
+    
+    // Outer Eye Corners: 33 (Right), 263 (Left)
+    const eyeR = lm[33];
+    const eyeL = lm[263];
+    const eyeDist = distance(eyeR, eyeL) || 1;
+
+    // Calculate Head Roll Angle (tilt)
+    const rollAngle = Math.atan2(eyeL.y - eyeR.y, eyeL.x - eyeR.x);
+    headTilt = Math.abs(rollAngle * (180 / Math.PI));
+
+    // Mouth Corners: 61 (Right), 291 (Left)
+    const mouthR = lm[61];
+    const mouthL = lm[291];
+
+    // Rotate points back by rollAngle to compensate for head tilt!
+    const mouthRY_compensated = mouthR.y * Math.cos(-rollAngle) - mouthR.x * Math.sin(-rollAngle);
+    const mouthLY_compensated = mouthL.y * Math.cos(-rollAngle) - mouthL.x * Math.sin(-rollAngle);
+
+    faceAsym = Math.abs(mouthRY_compensated - mouthLY_compensated) / eyeDist;
+
+    // Eye Aspect Ratio (Ptosis check)
+    // Eyelid top/bottom: Right eye (159, 145), Left eye (386, 374)
+    const earRight = distance(lm[159], lm[145]) / eyeDist;
+    const earLeft = distance(lm[386], lm[374]) / eyeDist;
+    eyePtosisDelta = Math.abs(earRight - earLeft);
+  }
+
+  if (poseRes && poseRes.landmarks && poseRes.landmarks.length > 0) {
+    const lm = poseRes.landmarks[0];
+    const shoulderR = lm[12];
+    const shoulderL = lm[11];
+    const wristR = lm[16];
+    const wristL = lm[15];
+
+    const shoulderWidth = distance(shoulderR, shoulderL) || 1;
+    const shoulderAvgY = (shoulderR.y + shoulderL.y) / 2;
+
+    armsRaised = wristR.y < shoulderAvgY && wristL.y < shoulderAvgY;
+    if (armsRaised) {
+      armDrift = Math.abs(wristR.y - wristL.y) / shoulderWidth;
+    }
+  }
+
+  return { faceAsym, eyePtosisDelta, headTilt, armDrift, armsRaised };
+}
+
+// Render Canvas Wireframe Overlays
+function drawLandmarkOverlay(faceRes, poseRes) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#00e5ff";
+  ctx.strokeStyle = "rgba(0, 229, 255, 0.4)";
+  ctx.lineWidth = 1.5;
+
+  if (faceRes && faceRes.faceLandmarks) {
+    const lm = faceRes.faceLandmarks[0];
+    // Draw face keypoints
+    [61, 291, 33, 263, 159, 145, 386, 374].forEach(idx => {
+      const p = lm[idx];
+      ctx.beginPath();
+      ctx.arc(p.x * canvas.width, p.y * canvas.height, 4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Draw connecting line between mouth corners
+    ctx.beginPath();
+    ctx.moveTo(lm[61].x * canvas.width, lm[61].y * canvas.height);
+    ctx.lineTo(lm[291].x * canvas.width, lm[291].y * canvas.height);
+    ctx.stroke();
+  }
+
+  if (poseRes && poseRes.landmarks) {
+    const lm = poseRes.landmarks[0];
+    ctx.fillStyle = "#3a82f6";
+    [11, 12, 15, 16].forEach(idx => {
+      const p = lm[idx];
+      ctx.beginPath();
+      ctx.arc(p.x * canvas.width, p.y * canvas.height, 6, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.beginPath();
+    ctx.moveTo(lm[15].x * canvas.width, lm[15].y * canvas.height);
+    ctx.lineTo(lm[16].x * canvas.width, lm[16].y * canvas.height);
+    ctx.stroke();
+  }
+}
+
+// Main Frame Loop
+function renderLoop() {
+  if (!isCamActive) return;
+
+  const now = performance.now();
+  const faceRes = faceLandmarker.detectForVideo(video, now);
+  const poseRes = poseLandmarker.detectForVideo(video, now);
+
+  drawLandmarkOverlay(faceRes, poseRes);
+  drawAudioWave();
+
+  const metrics = analyzeFrame(faceRes, poseRes);
+
+  if (isSampling) {
+    sampleData.push(metrics);
+  } else {
+    // Live feedback badges during preview
+    if (metrics.faceAsym !== null) {
+      valFace.textContent = `(${(metrics.faceAsym * 100).toFixed(1)}%)`;
+      setBadge(badgeFace, metrics.faceAsym > THRESHOLD_FACE_ASYM ? "warn" : "ok", metrics.faceAsym > THRESHOLD_FACE_ASYM ? "Asymmetry" : "Normal");
+    }
+    if (metrics.armsRaised) {
+      valArm.textContent = `(${(metrics.armDrift * 100).toFixed(1)}%)`;
+      setBadge(badgeArms, metrics.armDrift > THRESHOLD_ARM_DRIFT ? "warn" : "ok", metrics.armDrift > THRESHOLD_ARM_DRIFT ? "Drift Detected" : "Level");
+    } else {
+      valArm.textContent = "";
+      setBadge(badgeArms, "idle", "Raise Both Arms");
+    }
+
+    if (metrics.headTilt !== null) {
+      setBadge(badgeBalance, metrics.headTilt > 15 ? "warn" : "ok", metrics.headTilt > 15 ? "Tilt Detected" : "Balanced");
+    }
+    if (metrics.eyePtosisDelta !== null) {
+      setBadge(badgeEyes, metrics.eyePtosisDelta > THRESHOLD_EYE_PTOSIS ? "warn" : "ok", metrics.eyePtosisDelta > THRESHOLD_EYE_PTOSIS ? "Ptosis Alert" : "Normal");
+    }
+  }
+
+  animFrameId = requestAnimationFrame(renderLoop);
+}
+
+function setBadge(el, state, text) {
+  el.className = "badge " + state;
+  el.textContent = text;
+}
+
+// Execute 8-Second Screening Sweep
+async function runScreeningSweep() {
+  if (!isCamActive) return;
+  runCheckBtn.disabled = true;
+  isSampling = true;
+  sampleData = [];
+  recordedTranscript = "";
+
+  if (speechRecognizer) {
+    try {
+      speechRecognizer.start();
+      setBadge(badgeSpeech, "idle", "Listening...");
+    } catch(e){}
+  }
+
+  const startTime = performance.now();
+  const tick = () => {
+    const elapsed = performance.now() - startTime;
+    const pct = Math.min(100, (elapsed / SWEEP_DURATION_MS) * 100);
+    progressFill.style.width = pct + "%";
+    timerText.textContent = `${(elapsed / 1000).toFixed(1)}s / 8.0s`;
+
+    if (elapsed < SWEEP_DURATION_MS) {
+      requestAnimationFrame(tick);
+    } else {
+      finalizeSweep();
+    }
+  };
+  requestAnimationFrame(tick);
+}
+
+function finalizeSweep() {
+  isSampling = false;
+  runCheckBtn.disabled = false;
+
+  if (speechRecognizer) {
+    try { speechRecognizer.stop(); } catch(e){}
+  }
+
+  // Calculate Averages
+  const faceSamples = sampleData.map(s => s.faceAsym).filter(v => v !== null);
+  const armSamples = sampleData.filter(s => s.armsRaised).map(s => s.armDrift).filter(v => v !== null);
+  const eyeSamples = sampleData.map(s => s.eyePtosisDelta).filter(v => v !== null);
+  const tiltSamples = sampleData.map(s => s.headTilt).filter(v => v !== null);
+
+  const avgFace = faceSamples.length ? faceSamples.reduce((a,b)=>a+b, 0) / faceSamples.length : null;
+  const avgArm = armSamples.length ? armSamples.reduce((a,b)=>a+b, 0) / armSamples.length : null;
+  const avgEye = eyeSamples.length ? eyeSamples.reduce((a,b)=>a+b, 0) / eyeSamples.length : null;
+  const avgTilt = tiltSamples.length ? tiltSamples.reduce((a,b)=>a+b, 0) / tiltSamples.length : null;
+
+  const flagFace = avgFace !== null && avgFace > THRESHOLD_FACE_ASYM;
+  const flagArm = avgArm !== null && avgArm > THRESHOLD_ARM_DRIFT;
+  const flagEye = avgEye !== null && avgEye > THRESHOLD_EYE_PTOSIS;
+  const flagTilt = avgTilt !== null && avgTilt > 15;
+
+  // Speech Score
+  const wordsTarget = TARGET_PHRASE.split(" ");
+  const cleanTranscript = recordedTranscript.toLowerCase().replace(/[^a-z\s]/g, "");
+  const wordsSpoken = new Set(cleanTranscript.split(/\s+/));
+  const matchedWords = wordsTarget.filter(w => wordsSpoken.has(w)).length;
+  const speechRatio = matchedWords / wordsTarget.length;
+  const flagSpeech = recordedTranscript.trim().length > 0 && speechRatio < 0.6;
+
+  // Update Badges
+  setBadge(badgeFace, flagFace ? "warn" : "ok", flagFace ? "Asymmetric" : "Symmetrical");
+  setBadge(badgeArms, avgArm === null ? "idle" : flagArm ? "warn" : "ok", avgArm === null ? "Arms Low" : flagArm ? "Drifted" : "Stable");
+  setBadge(badgeEyes, flagEye ? "warn" : "ok", flagEye ? "Ptosis Alert" : "Normal");
+  setBadge(badgeBalance, flagTilt ? "warn" : "ok", flagTilt ? "Tilt Alert" : "Stable");
+  setBadge(badgeSpeech, recordedTranscript.trim().length === 0 ? "idle" : flagSpeech ? "warn" : "ok", recordedTranscript.trim().length === 0 ? "No Speech" : flagSpeech ? "Unclear" : "Clear");
+
+  displayFinalResult(flagFace || flagArm || flagEye || flagTilt || flagSpeech, { avgFace, avgArm, avgEye, avgTilt, speechRatio });
+}
+
+function displayFinalResult(isWarning, metrics) {
+  resultCard.classList.add("show");
+  const timestamp = new Date().toLocaleTimeString();
+
+  if (isWarning) {
+    resultCard.className = "result-card danger show";
+    resultTitle.innerHTML = "🚨 ACUTE STROKE WARNING DETECTED";
+    resultBody.innerHTML = `
+      <b>One or more BE-FAST signs detected at ${timestamp}.</b><br>
+      Call 911 / Emergency Services immediately. Do not allow the person to rest or sleep.<br>
+      <b>Tell Dispatcher:</b> "Possible acute stroke. Symptom verification time: ${timestamp}."
+    `;
+    
+    // Play audible notification alert
+    playEmergencyBeep();
+  } else {
+    resultCard.className = "result-card safe show";
+    resultTitle.innerHTML = "✓ NO ACUTE ASYMMETRY DETECTED";
+    resultBody.innerHTML = `
+      No overt facial palsy, arm drift, or speech distortion detected during this 8s sweep (${timestamp}).<br>
+      <i>Note: Sudden numbness, vision loss, or severe headache can still indicate stroke. Seek medical evaluation if concerned.</i>
+    `;
+  }
+}
+
+function playEmergencyBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(880, ctx.currentTime); // A5 note
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.8);
+  } catch(e){}
+}
+
+// Generate Printable/Downloadable EMT Handover Summary
+exportReportBtn.addEventListener("click", () => {
+  const timestamp = new Date().toLocaleString();
+  const reportText = `
+=====================================================
+ NEUROWATCH PRO AI - EMT HANDOVER INCIDENT REPORT
+=====================================================
+Timestamp: ${timestamp}
+Location: ${currentAddress}
+
+DIAGNOSTIC METRICS (BE-FAST Protocol):
+- B (Balance/Tilt): ${badgeBalance.textContent}
+- E (Eye/Ptosis): ${badgeEyes.textContent}
+- F (Facial Asymmetry): ${badgeFace.textContent} ${valFace.textContent}
+- A (Arm Drift): ${badgeArms.textContent} ${valArm.textContent}
+- S (Speech Accuracy): ${badgeSpeech.textContent}
+
+OVERALL WARNING STATUS: ${resultTitle.textContent.replace(/<[^>]*>?/gm, '')}
+
+REMARKS FOR EMERGENCY DEPARTMENT:
+- Screening run using 3D pose-compensated MediaPipe landmark tracking.
+- Audio transcript captured: "${recordedTranscript.trim() || 'N/A'}"
+=====================================================
+  `.trim();
+
+  const blob = new Blob([reportText], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `NeuroWatch_EMT_Report_${Date.now()}.txt`;
+  a.click();
+});
+
+function resetScreening() {
+  resultCard.className = "result-card";
+  progressFill.style.width = "0%";
+  timerText.textContent = "0.0s / 8.0s";
+  setBadge(badgeBalance, "idle", "idle");
+  setBadge(badgeEyes, "idle", "idle");
+  setBadge(badgeFace, "idle", "idle");
+  setBadge(badgeArms, "idle", "idle");
+  setBadge(badgeSpeech, "idle", "idle");
+  valFace.textContent = "";
+  valArm.textContent = "";
+}
+
+enableCamBtn.addEventListener("click", enableSensors);
+runCheckBtn.addEventListener("click", runScreeningSweep);
+resetBtn.addEventListener("click", resetScreening);
+</script>
+</body>
+</html>
