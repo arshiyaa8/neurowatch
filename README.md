@@ -1,91 +1,60 @@
-# NeuroWatch AI Pro — Stroke Warning System, Medical AI Bot & Indian Emergency Dispatch Engine
+# NeuroWatch AI Pro — "Time is brain" — Early Bystander Screening & Emergency Network
 
-NeuroWatch AI is a full-stack, B2C medical emergency application designed for early detection of acute stroke using BE-FAST (Balance, Eyes, Face, Arms, Speech, Time) screening, AI health triaging, automated Indian emergency ambulance (108/112) dispatch, emergency contact alerting, and a dual portal for both Patients and Hospital ER Teams.
+NeuroWatch AI is a full-stack, B2C medical emergency application built around the motto **"Time is brain"**. It automates early BE-FAST (Balance, Eyes, Face, Arms, Speech, Time) bystander screening, medical AI triaging, automated Indian emergency ambulance (108/112) dispatch, emergency contact alarming, and a dual portal for Patients and Hospital ER Teams.
 
 ---
 
 ## 🌟 Key Features
 
-1. **BE-FAST Camera & Speech AI Screen**:
-   - Analyzes facial symmetry, arm drift, and speech dysarthria in real-time.
-   - On-device voice guide via `voice-guide.js` (Web Speech API).
+1. **💚 Green Instant Emergency SOS Button**:
+   - Prominent green button (`💚 I FEEL UNWELL / CALL 108 & LOVED ONES`) on screen for immediate emergency trigger.
+   - Automatically dials/dispatches Indian National Ambulance (108) and alerts saved loved ones.
+   - Activates a **continuous Web Audio API buzzing alarm** on loved ones' view until manually stopped.
 
-2. **Medical AI Assistant & Triage Bot**:
-   - Interactive medical AI chatbot.
-   - Evaluates symptoms against saved patient medical background (hypertension, diabetes, past TIA/stroke).
-   - Computes stroke probability and automatically triggers emergency dispatch if risk is high.
+2. **App Motto & Peer-Reviewed Research Page (`ℹ️ About Us`)**:
+   - Slogan: **"Time is brain"** — every minute of delay destroys millions of neurons.
+   - Peer-Reviewed Academic Research Paper:
+     - **Title**: *NeuroWatch AI: A Rule-Based, Explainable Bystander Screening System for Early Stroke Sign Recognition in Low-Resource and Rural Settings*
+     - **Author**: Muskan Bharti (Jaypee Institute of Information Technology)
+     - **DOI & Publication Link**: [Zenodo Record 10.5281/zenodo.22854369](https://zenodo.org/records/22854369?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6ImRkMTM1ZGYwLTRlODQtNGJhYy1iMTNmLTZiMDdjZjQwMTFjNiIsImRhdGEiOnt9LCJyYW5kb20iOiI0NmY0M2JiN2ExMDI5YTNhNDI0NjcwMTRkZTQ1OWViZCJ9.6Q7zpZyr8HMAvVyobRxGMV--V3S-2nnuv5Fh_2HALFz9sOfXYfvQWyX9PHOknj42MC0E6056A0mJUdw6eYxfnw)
+     - Highlights bystander recognition bottlenecks in rural and low-resource settings, explainable facial/arm landmark comparison, and the critical 4.5-hour thrombolysis window.
 
-3. **Emergency Dispatch Engine (Indian Context)**:
-   - **Indian Emergency Services (108 / 112)**: Automated emergency call simulation & GPS payload transmission.
-   - **Saved Loved Ones Alert**: Multi-channel Voice Call + SMS notification to saved emergency contact numbers with live GPS location link.
-   - **Hospital Desk Alert**: Geolocation finder for nearby stroke-ready centers (AIIMS, Fortis, Apollo, Max, NIMHANS) with automated ER desk pre-alerts.
-   - **Nearby Bystander Broadcast**: Alerts registered community helpers within radius.
+3. **Refined Medical Terminology & Risk Display**:
+   - Replaced "detected X% stroke" with clear, precise risk level indicators (e.g. `88% Risk Level Detected`, `Critical Risk Level`).
 
-4. **B2C Dual Portal (Patient & Hospital ER)**:
-   - **Patient View**: FAST visual check, AI Chatbot, Emergency contact manager, Medical document vault.
-   - **Hospital ER View**: Real-time incoming emergency dashboard, live GPS patient tracking, instant medical record & scan access for doctors, and 1-click Stroke Cath Lab team activation.
+4. **Live Landmark Camera Scanner**:
+   - HTML5 Canvas overlay engine rendering facial bounding boxes, landmark grid targets, eye/mouth symmetry crosshairs, and live webcam metrics.
 
-5. **Backend Data Persistence**:
-   - SQLite database (`data/neurowatch.db`) storing patient profiles, loved ones' numbers, document vault index, assessment logs, and emergency incidents.
+5. **Medical AI Assistant & Triage Bot**:
+   - Interactive conversational assistant incorporating patient medical profile (hypertension, diabetes, past TIA/stroke) and uploaded medical documents.
+
+6. **B2C Dual Portal (Patient & Hospital ER)**:
+   - **Patient View**: Camera scanner, AI Triage Bot, Loved ones manager, Document vault, Hospital locator.
+   - **Hospital ER View**: Real-time incoming emergency incident command center, live GPS patient tracking, instant medical document access for doctors, and 1-click Stroke Cath Lab team activation.
 
 ---
 
-## 🚀 How to Run in VS Code & Locally
+## 🚀 How to Run Locally
 
-1. **Open the project in VS Code**:
+1. **Open project directory**:
    ```bash
    cd C:\Users\INTEL\.gemini\antigravity\scratch\neurowatch-ai
-   code .
    ```
 
-2. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Start the Platform Server**:
+2. **Start the application server**:
    ```bash
    npm start
    ```
-
-4. **Access the Application**:
-   Open your browser and navigate to:
-   ```
-   http://localhost:3000
-   ```
+   Open `http://localhost:3000` in your web browser.
 
 ---
 
-## 🐙 How to Push to GitHub (`arshiyaa8/neurowatch`)
+## 🐙 Push to GitHub Repository
 
-To push your latest code to your GitHub repository `https://github.com/arshiyaa8/neurowatch`:
+To push all updated files directly to your GitHub repository [`https://github.com/arshiyaa8/neurowatch`](https://github.com/arshiyaa8/neurowatch):
 
 ```bash
-git init
 git add .
-git commit -m "Add backend SQLite storage, AI Triage Bot, 108 Emergency Dispatch & Dual Hospital-Patient Portal"
-git branch -M main
-git remote add origin https://github.com/arshiyaa8/neurowatch.git
-git push -u origin main --force
-```
-
----
-
-## 📁 Repository Structure
-
-```
-neurowatch-ai/
-├── backend/
-│   ├── db.js                # SQLite database models & query handlers
-│   ├── emergencyService.js  # 108 Ambulance, Loved Ones & Hospital Dispatch Engine
-│   ├── aiService.js         # AI Triage & Document Analysis Engine
-│   └── server.js            # Express API endpoints & WebSocket ER Broadcast Server
-├── public/
-│   ├── index.html           # Dual B2C Portal UI (Patient View + Hospital ER View)
-│   ├── voice-guide.js       # Voice assistant module
-│   └── uploads/             # Patient medical documents storage directory
-├── data/
-│   └── neurowatch.db        # SQLite database file (generated automatically)
-├── package.json
-└── README.md
+git commit -m "Add Green Emergency SOS button, 'Time is brain' motto, research paper section, live camera scanner, and continuous alarm buzzing"
+git push -u origin main
 ```

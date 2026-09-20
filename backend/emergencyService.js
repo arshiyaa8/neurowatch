@@ -10,7 +10,7 @@ class EmergencyService {
   /**
    * Triggers a comprehensive emergency response for a given patient incident.
    */
-  async triggerEmergencyResponse({ patientId = 1, strokeScore = 85, latitude = 28.5672, longitude = 77.2100, customReason = 'High Stroke Probability Detected via BE-FAST Screen' }, wss = null) {
+  async triggerEmergencyResponse({ patientId = 1, strokeScore = 85, latitude = 28.5672, longitude = 77.2100, customReason = 'High Risk Level Detected via BE-FAST Screen' }, wss = null) {
     return new Promise((resolve, reject) => {
       db.get('SELECT * FROM patients WHERE id = ?', [patientId], (err, patient) => {
         if (err || !patient) {
@@ -80,7 +80,7 @@ class EmergencyService {
                     unitId: `AMB-IND-108-${Math.floor(Math.random()*900 + 100)}`,
                     etaMinutes,
                     callLogs: [
-                      `[AUTO-CALL TO 108 CONTROL ROOM] Dispatching stroke emergency payload for patient ${patient.name}.`,
+                      `[AUTO-CALL TO 108 CONTROL ROOM] Dispatching emergency payload for patient ${patient.name}.`,
                       `[GPS TRANSMITTED] Coordinates: (${latitude}, ${longitude}).`
                     ]
                   },
@@ -90,7 +90,8 @@ class EmergencyService {
                     phone: c.phone,
                     callStatus: 'CALL_CONNECTED',
                     smsStatus: 'SMS_SENT',
-                    message: `EMERGENCY ALERT: ${patient.name} has a potential stroke alert (${strokeScore}% score). Ambulance 108 dispatched. Location: https://maps.google.com/?q=${latitude},${longitude}`
+                    alarmStatus: 'CONTINUOUS_ALARM_BUZZING_ACTIVE',
+                    message: `EMERGENCY ALERT: ${patient.name} has triggered a high urgency alert (${strokeScore}% risk score). Ambulance 108 dispatched. Location: https://maps.google.com/?q=${latitude},${longitude}`
                   })),
                   bystandersNotifiedCount,
                   assignedHospital: {
