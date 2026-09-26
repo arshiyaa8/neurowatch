@@ -161,7 +161,7 @@
 
   .green-emergency-sos-btn:hover {
     transform: scale(1.04);
-    box-shadow: 0 0 30px rgba(16, 185, 129, 0.8);
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.85);
   }
 
   @keyframes greenPulse {
@@ -376,7 +376,7 @@
   .status-ok { background: rgba(16, 185, 129, 0.15); color: var(--emerald-ok); border: 1px solid var(--emerald-ok); }
   .status-danger { background: rgba(239, 68, 68, 0.15); color: var(--crimson-danger); border: 1px solid var(--crimson-danger); }
 
-  /* Emergency Alarm Modal */
+  /* Modals */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -397,6 +397,29 @@
     width: 100%;
     padding: 28px;
     box-shadow: 0 0 50px rgba(239, 68, 68, 0.6);
+  }
+
+  /* Countdown Circle */
+  .countdown-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px dashed var(--crimson-danger);
+    border-radius: 16px;
+    margin-bottom: 20px;
+  }
+
+  .countdown-number {
+    font-family: var(--font-mono);
+    font-size: 64px;
+    font-weight: 800;
+    color: var(--crimson-danger);
+    line-height: 1;
+    margin: 10px 0;
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
   }
 
   .alarm-buzzing-banner {
@@ -451,7 +474,7 @@
   </div>
 
   <!-- Prominent Green Emergency SOS Button -->
-  <button class="green-emergency-sos-btn" onclick="triggerManualSOS('Green Instant Emergency SOS Pressed')">
+  <button class="green-emergency-sos-btn" onclick="startEmergencyCountdown('Green Instant Emergency SOS Pressed')">
     💚 I FEEL UNWELL / CALL 108 & LOVED ONES
   </button>
 </header>
@@ -463,7 +486,7 @@
     <div class="grid-2">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">👁️ Live BE-FAST Camera & Landmark Detector</div>
+          <div class="card-title">👁️ Live Camera Motion & Asymmetry Scanner</div>
           <span class="status-badge status-ok" id="camera-status">Camera Standby</span>
         </div>
 
@@ -473,21 +496,21 @@
         </div>
 
         <div class="stage-controls">
-          <button class="btn btn-green" onclick="startCameraScreen()">▶️ Enable Camera & Start Check</button>
+          <button class="btn btn-green" onclick="startCameraScreen()">▶️ Enable Camera & Motion Sensor</button>
           <button class="btn btn-outline" onclick="VoiceGuide.start()">🎙️ Voice Guide</button>
-          <button class="btn btn-danger" onclick="simulateAsymmetryDetection()">⚡ Test Asymmetry Alert</button>
+          <button class="btn btn-danger" onclick="simulateAsymmetryDetection()">⚡ Trigger Risk Test</button>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">📊 Real-Time Landmark Diagnostic Metrics</div>
+          <div class="card-title">📊 Real-Time Motion Diagnostic Metrics</div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <div>
             <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-              <span>Facial Landmark Symmetry Index</span>
+              <span>Facial Motion & Symmetry Index</span>
               <span id="face-score-val" style="color: var(--emerald-ok); font-weight: 700;">Normal (98% Balance)</span>
             </div>
             <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
@@ -497,7 +520,7 @@
 
           <div>
             <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-              <span>Arm Elevation Balance</span>
+              <span>Arm Motion & Elevation Balance</span>
               <span id="arm-score-val" style="color: var(--emerald-ok); font-weight: 700;">Normal (95% Parallel)</span>
             </div>
             <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
@@ -507,18 +530,18 @@
 
           <div>
             <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-              <span>Speech Audio Articulation Index</span>
-              <span id="speech-score-val" style="color: var(--emerald-ok); font-weight: 700;">Clear Speech</span>
+              <span>Live Frame Motion Energy</span>
+              <span id="motion-score-val" style="color: var(--cyan-accent); font-weight: 700;">Active Motion (0.84)</span>
             </div>
             <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-              <div id="speech-bar" style="width: 100%; height: 100%; background: var(--emerald-ok); transition: all 0.3s ease;"></div>
+              <div id="motion-bar" style="width: 84%; height: 100%; background: var(--cyan-accent); transition: all 0.3s ease;"></div>
             </div>
           </div>
 
           <div style="background: rgba(10, 16, 28, 0.9); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); margin-top: 10px;">
             <div style="font-size: 12px; color: var(--text-muted);">Overall Risk Assessment</div>
             <div id="stroke-prob-text" style="font-size: 32px; font-weight: 800; font-family: var(--font-mono); color: var(--emerald-ok);">12% Risk Level</div>
-            <div id="stroke-prob-sub" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Symmetry normal. Remember: "Time is brain". If you feel unwell, tap the Green Emergency button.</div>
+            <div id="stroke-prob-sub" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Facial motion & asymmetry normal. "Time is brain". If you feel unwell, press the Green Emergency button.</div>
           </div>
         </div>
       </div>
@@ -658,9 +681,12 @@
       <div style="text-align: center; padding: 20px 0; border-bottom: 1px solid var(--panel-border); margin-bottom: 24px;">
         <h1 style="font-family: var(--font-mono); font-size: 32px; color: #fff; margin-bottom: 8px;">NeuroWatch AI</h1>
         <h3 style="font-family: var(--font-mono); font-size: 22px; color: var(--cyan-accent); font-style: italic;">"Time is brain"</h3>
-        <p style="color: var(--text-muted); font-size: 14px; max-width: 700px; margin: 12px auto 0 auto; line-height: 1.6;">
+        <p style="color: var(--text-muted); font-size: 14px; max-width: 720px; margin: 12px auto 0 auto; line-height: 1.6;">
           Every minute of delay during an acute neurological onset destroys up to 1.9 million neurons. Early bystander recognition is the critical gateway to saving lives and preventing permanent disability.
         </p>
+        <div style="margin-top: 14px; font-family: var(--font-mono); font-size: 14px; color: var(--emerald-ok);">
+          📧 Contact Us: <a href="mailto:neurowatch0@gmail.com" style="color: var(--cyan-accent); text-decoration: underline;">neurowatch0@gmail.com</a>
+        </div>
       </div>
 
       <div class="grid-2">
@@ -674,7 +700,8 @@
               <strong>Author:</strong> Muskan Bharti (Jaypee Institute of Information Technology)
             </p>
             <p style="color: var(--text-muted); margin-bottom: 14px;">
-              <strong>DOI & Publication:</strong> <a href="https://zenodo.org/records/22854369?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6ImRkMTM1ZGYwLTRlODQtNGJhYy1iMTNmLTZiMDdjZjQwMTFjNiIsImRhdGEiOnt9LCJyYW5kb20iOiI0NmY0M2JiN2ExMDI5YTNhNDI0NjcwMTRkZTQ1OWViZCJ9.6Q7zpZyr8HMAvVyobRxGMV--V3S-2nnuv5Fh_2HALFz9sOfXYfvQWyX9PHOknj42MC0E6056A0mJUdw6eYxfnw" target="_blank" style="color: var(--cyan-accent); text-decoration: underline;">Zenodo Record 10.5281/zenodo.22854369</a>
+              <strong>DOI & Zenodo Publication Record:</strong><br>
+              <a href="https://zenodo.org/records/22857781?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjYxYjIxZDMwLWVmMmQtNDllZS1hM2I0LWVlYWM0MGI2OTFiYSIsImRhdGEiOnt9LCJyYW5kb20iOiIxOWExYjQ3MGM0ZDQyZTk3NDk0MWZkYTU1YjcwNjc3ZiJ9.GN0qHDBFygQ5s61XaNLzpBW_sY2sKEwCT8hf_KfXFLIPU6XPeV0CPtiCt1Kg2DPqczGWbI_XkKBvMDhgjC0k9w" target="_blank" style="color: var(--cyan-accent); text-decoration: underline; word-break: break-all;">Zenodo Record 10.5281/zenodo.22857781</a>
             </p>
 
             <strong style="color: #fff; display: block; margin-top: 10px;">Core Research Insights:</strong>
@@ -729,6 +756,26 @@
 
 </main>
 
+<!-- ==================== EMERGENCY COUNTDOWN MODAL ==================== -->
+<div class="modal-overlay" id="countdown-modal">
+  <div class="modal-content" style="border-color: var(--amber-warn); text-align: center;">
+    <h2 style="font-family: var(--font-mono); color: var(--amber-warn); font-size: 20px; margin-bottom: 10px;">⚠️ HIGH RISK LEVEL DETECTED</h2>
+    <p style="color: var(--text-main); font-size: 14px; margin-bottom: 14px;">
+      AUTOMATIC 108 AMBULANCE DISPATCH & LOVED ONES ALARM IN:
+    </p>
+
+    <div class="countdown-box">
+      <div class="countdown-number" id="countdown-timer">10</div>
+      <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);">SECONDS REMAINING</div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: center;">
+      <button class="btn btn-danger" style="flex: 1;" onclick="cancelEmergencyCountdown()">❌ CANCEL DISPATCH (FALSE ALARM)</button>
+      <button class="btn btn-green" style="flex: 1;" onclick="confirmEmergencyDispatchNow()">⚡ DISPATCH AMBULANCE NOW</button>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== EMERGENCY SOS MODAL WITH CONTINUOUS ALARM ==================== -->
 <div class="modal-overlay" id="sos-modal">
   <div class="modal-content">
@@ -773,10 +820,13 @@
   let currentTab = 'screen-view';
   let wsClient = null;
   let alarmAudioCtx = null;
-  let alarmOscillator = null;
   let alarmInterval = null;
   let isCamActive = false;
   let animFrameId = null;
+  let previousFrameData = null;
+  let countdownTimerId = null;
+  let countdownSeconds = 10;
+  let pendingEmergencyReason = '';
 
   function switchTab(tabId) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -793,7 +843,7 @@
     if (tabId === 'er-portal-view') loadHospitalERPortal();
   }
 
-  // Camera & Real-Time Facial Landmark Drawing Engine
+  // Camera & Real-Time Motion Detector Engine
   function startCameraScreen() {
     const webcam = document.getElementById('webcam');
     const canvas = document.getElementById('overlayCanvas');
@@ -803,13 +853,13 @@
       .then(stream => {
         webcam.srcObject = stream;
         isCamActive = true;
-        document.getElementById('camera-status').innerText = 'Live Feed Active (Landmark Scanner On)';
+        document.getElementById('camera-status').innerText = 'Live Feed Active (Motion Sensor On)';
         document.getElementById('camera-status').className = 'status-badge status-ok';
 
         webcam.onloadedmetadata = () => {
           canvas.width = webcam.videoWidth || 640;
           canvas.height = webcam.videoHeight || 480;
-          renderLandmarkOverlay(webcam, canvas, ctx);
+          renderMotionOverlay(webcam, canvas, ctx);
         };
 
         if (window.VoiceGuide) VoiceGuide.start();
@@ -820,29 +870,72 @@
       });
   }
 
-  function renderLandmarkOverlay(video, canvas, ctx) {
+  function renderMotionOverlay(video, canvas, ctx) {
     if (!isCamActive) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     const w = canvas.width;
     const h = canvas.height;
 
-    // Draw Face Bounding Box & Target Mesh
+    // Draw current video frame to canvas
+    ctx.drawImage(video, 0, 0, w, h);
+    const currentFrame = ctx.getImageData(0, 0, w, h);
+
+    // Calculate Motion & Asymmetry Index between left and right sides
+    let motionDifference = 0;
+    let leftSideMotion = 0;
+    let rightSideMotion = 0;
+
+    if (previousFrameData) {
+      const data = currentFrame.data;
+      const prevData = previousFrameData.data;
+      const step = 16; // sample every 16th pixel for performance
+
+      for (let i = 0; i < data.length; i += 4 * step) {
+        const diff = Math.abs(data[i] - prevData[i]) + Math.abs(data[i+1] - prevData[i+1]) + Math.abs(data[i+2] - prevData[i+2]);
+        motionDifference += diff;
+
+        const pixelIndex = i / 4;
+        const x = pixelIndex % w;
+        if (x < w / 2) {
+          leftSideMotion += diff;
+        } else {
+          rightSideMotion += diff;
+        }
+      }
+    }
+    previousFrameData = currentFrame;
+
+    // Normalize Motion Scores
+    const motionNormalized = Math.min(1.0, (motionDifference / 500000).toFixed(2));
+    const asymmetryRatio = Math.abs(leftSideMotion - rightSideMotion) / (leftSideMotion + rightSideMotion + 1);
+
+    // Update UI elements dynamically based on live motion
+    document.getElementById('motion-score-val').innerText = `Active Motion (${motionNormalized})`;
+    document.getElementById('motion-bar').style.width = `${Math.round(motionNormalized * 100)}%`;
+
+    if (asymmetryRatio > 0.35 && motionNormalized > 0.2) {
+      document.getElementById('face-score-val').innerText = 'Asymmetry Detected (High Risk)';
+      document.getElementById('face-score-val').style.color = 'var(--crimson-danger)';
+      document.getElementById('face-bar').style.width = '35%';
+      document.getElementById('face-bar').style.background = 'var(--crimson-danger)';
+    }
+
+    // Overlay Landmark Mesh and Motion Vectors
+    ctx.clearRect(0, 0, w, h); // clear image so mirror webcam video shows beneath
     ctx.strokeStyle = '#00e5ff';
     ctx.lineWidth = 2;
     ctx.strokeRect(w * 0.25, h * 0.15, w * 0.5, h * 0.65);
 
-    // Draw Crosshairs & Facial Landmark Points
-    ctx.fillStyle = '#10b981';
+    // Draw Facial Landmark Points
+    ctx.fillStyle = asymmetryRatio > 0.35 ? '#ef4444' : '#10b981';
     ctx.beginPath();
-    ctx.arc(w * 0.4, h * 0.35, 4, 0, Math.PI * 2); // Left Eye
-    ctx.arc(w * 0.6, h * 0.35, 4, 0, Math.PI * 2); // Right Eye
-    ctx.arc(w * 0.5, h * 0.5, 4, 0, Math.PI * 2);  // Nose
-    ctx.arc(w * 0.42, h * 0.62, 4, 0, Math.PI * 2); // Left Mouth Corner
-    ctx.arc(w * 0.58, h * 0.62, 4, 0, Math.PI * 2); // Right Mouth Corner
+    ctx.arc(w * 0.4, h * 0.35, 5, 0, Math.PI * 2); // Left Eye
+    ctx.arc(w * 0.6, h * 0.35, 5, 0, Math.PI * 2); // Right Eye
+    ctx.arc(w * 0.5, h * 0.5, 5, 0, Math.PI * 2);  // Nose
+    ctx.arc(w * 0.42, h * 0.62, 5, 0, Math.PI * 2); // Left Mouth
+    ctx.arc(w * 0.58, h * 0.62, 5, 0, Math.PI * 2); // Right Mouth
     ctx.fill();
 
-    // Draw Symmetry Line
+    // Symmetry Line
     ctx.strokeStyle = 'rgba(0, 229, 255, 0.4)';
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
@@ -851,7 +944,7 @@
     ctx.stroke();
     ctx.setLineDash([]);
 
-    animFrameId = requestAnimationFrame(() => renderLandmarkOverlay(video, canvas, ctx));
+    animFrameId = requestAnimationFrame(() => renderMotionOverlay(video, canvas, ctx));
   }
 
   function simulateCameraOverlay(canvas, ctx) {
@@ -861,7 +954,7 @@
     ctx.fillRect(0, 0, 640, 480);
     ctx.fillStyle = '#00e5ff';
     ctx.font = '16px IBM Plex Mono';
-    ctx.fillText('Camera Simulated — Scanner Active', 180, 240);
+    ctx.fillText('Camera Simulated — Motion Sensor Active', 160, 240);
   }
 
   function simulateAsymmetryDetection() {
@@ -872,28 +965,59 @@
 
     document.getElementById('stroke-prob-text').innerText = '88% Risk Level';
     document.getElementById('stroke-prob-text').style.color = 'var(--crimson-danger)';
-    document.getElementById('stroke-prob-sub').innerText = 'Facial landmark asymmetry and drift detected. "Time is brain" — calling emergency.';
+    document.getElementById('stroke-prob-sub').innerText = 'Facial motion asymmetry detected. Starting emergency countdown.';
 
-    // Post check to backend
-    fetch('/api/checks', {
+    startEmergencyCountdown('Facial Motion Asymmetry Risk Detected');
+  }
+
+  // Emergency Countdown Timer Logic
+  function startEmergencyCountdown(reason = 'High Risk Level Detected') {
+    pendingEmergencyReason = reason;
+    countdownSeconds = 10;
+    document.getElementById('countdown-timer').innerText = countdownSeconds;
+    document.getElementById('countdown-modal').style.display = 'flex';
+
+    if (window.VoiceGuide) {
+      VoiceGuide.speak("High risk detected. Automatic ambulance dispatch in 10 seconds. Tap cancel if false alarm.");
+    }
+
+    if (countdownTimerId) clearInterval(countdownTimerId);
+    countdownTimerId = setInterval(() => {
+      countdownSeconds--;
+      document.getElementById('countdown-timer').innerText = countdownSeconds;
+
+      if (countdownSeconds <= 0) {
+        clearInterval(countdownTimerId);
+        document.getElementById('countdown-modal').style.display = 'none';
+        confirmEmergencyDispatchNow();
+      }
+    }, 1000);
+  }
+
+  function cancelEmergencyCountdown() {
+    if (countdownTimerId) {
+      clearInterval(countdownTimerId);
+      countdownTimerId = null;
+    }
+    document.getElementById('countdown-modal').style.display = 'none';
+    if (window.VoiceGuide) VoiceGuide.speak("Emergency dispatch canceled.");
+  }
+
+  function confirmEmergencyDispatchNow() {
+    if (countdownTimerId) {
+      clearInterval(countdownTimerId);
+      countdownTimerId = null;
+    }
+    document.getElementById('countdown-modal').style.display = 'none';
+    startEmergencyAlarmSound();
+
+    fetch('/api/emergency/trigger', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        face_result: 'asymmetry detected',
-        arm_result: 'left arm drift',
-        speech_result: 'slurred speech',
-        stroke_probability: 88,
-        urgency_level: 'CRITICAL',
-        latitude: 28.5672,
-        longitude: 77.2100
-      })
+      body: JSON.stringify({ strokeScore: 92, reason: pendingEmergencyReason || 'Instant Emergency SOS Pressed' })
     })
     .then(r => r.json())
-    .then(data => {
-      if (data.emergencyTriggered) {
-        showSOSModal(data.emergencyPayload);
-      }
-    });
+    .then(payload => showSOSModal(payload));
   }
 
   // Chatbot logic
@@ -919,7 +1043,7 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
       if (data.emergencyTriggered) {
-        showSOSModal(data.emergencyPayload);
+        startEmergencyCountdown('AI Chatbot Identified Critical Risk');
       }
     });
   }
@@ -1107,19 +1231,6 @@
           </div>
         `;
       });
-  }
-
-  // Trigger Emergency SOS
-  function triggerManualSOS(reasonText = 'Green Instant Emergency SOS Button Triggered') {
-    startEmergencyAlarmSound();
-
-    fetch('/api/emergency/trigger', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ strokeScore: 92, reason: reasonText })
-    })
-    .then(r => r.json())
-    .then(payload => showSOSModal(payload));
   }
 
   // Web Audio Continuous Alarm Synthesizer
