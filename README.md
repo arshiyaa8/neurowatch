@@ -1,40 +1,57 @@
-# NeuroWatch AI Pro — "Time is brain" — Guided 3-Step Screening & Emergency Network
+# NeuroWatch AI Pro — Passive Continuous Monitoring & Emergency Network
 
-NeuroWatch AI is a full-stack, B2C medical emergency application built around the motto **"Time is brain"**. It features a guided 3-step screening wizard (Face Asymmetry, Hand Elevation, Speech Sentence Check), real-time elapsed time tracking from risk detection until ambulance call, automated Indian emergency ambulance (108/112) dispatch, emergency contact alarming, and a dual portal for Patients and Hospital ER Teams.
+NeuroWatch AI is a full-stack, B2C medical emergency application built around the motto **"Time is brain"**. It operates as a **passive continuous monitoring system** that assumes no manual user interaction is possible after camera launch. It automatically detects facial asymmetry, hand/arm movement, and speech signals in real time, aggregating risk scores to trigger emergency workflows when confirmed.
 
 ---
 
-## 🌟 Key Features
+## 🌟 Passive Continuous Pipeline Architecture
 
-1. **⏱️ Elapsed Time Stopwatch Timer (Detection ➡️ Ambulance Call)**:
-   - Starts automatically the moment a symptom or risk sign is detected.
-   - Counts up continuously (`00:01, 00:02, 00:03...`) tracking the golden time window ("Time is brain").
-   - Runs until the **108 Emergency Ambulance is called**, locking the final elapsed duration (e.g. `Ambulance Called at 00:42 after detection`).
+### 1. Zero-Interaction Camera Pipeline
+- As soon as the camera starts, the system continuously analyzes incoming frames via `requestAnimationFrame`.
+- **Face Detection**: Automatically detects face presence, measuring facial landmark symmetry index (`Face: 78% detected`, `Face Asymmetry: 84%`).
+- **Hand / Arm Detection**: Automatically activates when hands/arms are visible in frame, monitoring elevation & movement asymmetry (`Hand: 60% detected`, `Arm Movement: 82%`).
+- **Speech Signal Autodiscovery**: Continuously monitors background speech and audio articulation in parallel.
 
-2. **👁️ Guided 3-Step Motion & Symptom Screening Flow**:
-   - **Step 1: Facial Asymmetry Check**: Live canvas scanner analyzing facial drooping and left vs right mouth corner alignment.
-   - **Step 2: Raised Hand & Arm Elevation Check**: Instructs user to raise both hands in front of them with palms up, tracking hand elevation & arm drift.
-   - **Step 3: Speech Sentence Verification**: Prompts user to read aloud *"The sky is blue in Cincinnati"*, analyzing speech articulation via Web Speech API mic input.
+### 2. Live Detection Dashboard Side Panel
+Displays real-time diagnostic values updated frame-by-frame:
+```
+NEUROWATCH AI
+Emergency Monitoring
 
-3. **💚 Green Instant Emergency SOS Button**:
-   - Prominent green button (`💚 I FEEL UNWELL / CALL 108 & LOVED ONES`).
-   - Automatically dispatches 108 Ambulance and alerts saved loved ones.
-   - Activates a **continuous Web Audio API buzzing alarm** on loved ones' view until manually stopped.
+FACE
+Facial Asymmetry     78%
+Confidence           91%
 
-4. **🧠 Motto Slogan & Peer-Reviewed Academic Research Page (`ℹ️ About Us`)**:
-   - Slogan: **"Time is brain"**
-   - Contact Email: **neurowatch0@gmail.com**
-   - Peer-Reviewed Academic Research Paper:
-     - **Title**: *NeuroWatch AI: A Rule-Based, Explainable Bystander Screening System for Early Stroke Sign Recognition in Low-Resource and Rural Settings*
-     - **Author**: Muskan Bharti (Jaypee Institute of Information Technology)
-     - **DOI & Zenodo Publication Link**: [Zenodo Record 10.5281/zenodo.22857781](https://zenodo.org/records/22857781?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6IjYxYjIxZDMwLWVmMmQtNDllZS1hM2I0LWVlYWM0MGI2OTFiYSIsImRhdGEiOnt9LCJyYW5kb20iOiIxOWExYjQ3MGM0ZDQyZTk3NDk0MWZkYTU1YjcwNjc3ZiJ9.GN0qHDBFygQ5s61XaNLzpBW_sY2sKEwCT8hf_KfXFLIPU6XPeV0CPtiCt1Kg2DPqczGWbI_XkKBvMDhgjC0k9w)
+HAND / ARM
+Movement             60%
+Confidence           87%
 
-5. **Medical AI Assistant & Triage Bot**:
-   - Interactive conversational assistant incorporating patient medical profile (hypertension, diabetes, past TIA) and uploaded medical documents.
+SPEECH / OTHER
+Status               Monitoring
 
-6. **B2C Dual Portal (Patient & Hospital ER)**:
-   - **Patient View**: Guided 3-step scanner, AI Triage Bot, Loved ones manager, Document vault, Hospital locator.
-   - **Hospital ER View**: Real-time incoming emergency incident command center, live GPS patient tracking, instant medical document access for doctors, and 1-click Stroke Cath Lab team activation.
+OVERALL RISK
+████████████░░ 78%
+
+SYSTEM STATUS
+● Monitoring
+```
+
+### 3. Automatic 90%+ Risk Threshold & 3-Second Confirmation Hold
+- **Configurable Threshold**: `CONFIG_EMERGENCY_THRESHOLD = 90%`
+- **Confirmation Hold**: `CONFIG_CONFIRMATION_HOLD_MS = 3000ms` (3 seconds)
+- **False Positive Mitigation**: Uses a 15-frame rolling window buffer (`frameRiskHistory`) to calculate smoothed risk. Isolated single-frame spikes do NOT trigger false alarms.
+- **Confirmation Logic**:
+  - If smoothed risk reaches `>= 90%`, a 3-second confirmation timer begins (`🚨 POSSIBLE STROKE DETECTED (94%)`).
+  - If risk remains `>= 90%` for 3 seconds continuously, `trigger_emergency_response()` is executed.
+  - If risk drops below 90% before 3 seconds, the confirmation timer is reset.
+
+### 4. Configurable Emergency Action (`trigger_emergency_response`)
+- Handler: `trigger_emergency_response(reason, riskScore)`
+- Safe Demo Mode: `CONFIG_ENABLE_REAL_CALL = false` (prevents accidental live 108 emergency service calls during testing).
+- Plays audio alarm, opens emergency modal with patient EHR & GPS link, alerts saved loved ones with continuous buzzing, and notifies hospital ER desks.
+
+### 5. Medical & Safety Disclaimer
+- *NeuroWatch AI is a prototype screening aid, not a diagnostic medical device. It uses language such as "Possible stroke detected — emergency response recommended" rather than claiming a definitive medical diagnosis.*
 
 ---
 
@@ -45,7 +62,7 @@ NeuroWatch AI is a full-stack, B2C medical emergency application built around th
    cd C:\Users\INTEL\.gemini\antigravity\scratch\neurowatch-ai
    ```
 
-2. **Start the application server**:
+2. **Start the server**:
    ```bash
    npm start
    ```
@@ -59,6 +76,6 @@ To push all updated files directly to your GitHub repository [`https://github.co
 
 ```bash
 git add .
-git commit -m "Add guided 3-step motion screening wizard and elapsed time stopwatch timer from risk detection until ambulance call"
+git commit -m "Refactor state machine into passive continuous monitoring pipeline with live dashboard and 90% 3s confirmation hold"
 git push -u origin main
 ```
