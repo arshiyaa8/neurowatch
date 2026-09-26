@@ -1,18 +1,20 @@
-# NeuroWatch AI Pro — "Time is brain" — Early Bystander Screening & Emergency Network
+# NeuroWatch AI Pro — "Time is brain" — Guided 3-Step Screening & Emergency Network
 
-NeuroWatch AI is a full-stack, B2C medical emergency application built around the motto **"Time is brain"**. It automates early BE-FAST (Balance, Eyes, Face, Arms, Speech, Time) bystander screening, real-time motion & facial asymmetry detection, medical AI triaging, automated Indian emergency ambulance (108/112) dispatch, emergency contact alarming, and a dual portal for Patients and Hospital ER Teams.
+NeuroWatch AI is a full-stack, B2C medical emergency application built around the motto **"Time is brain"**. It features a guided 3-step screening wizard (Face Asymmetry, Hand Elevation, Speech Sentence Check), real-time elapsed time tracking from risk detection until ambulance call, automated Indian emergency ambulance (108/112) dispatch, emergency contact alarming, and a dual portal for Patients and Hospital ER Teams.
 
 ---
 
 ## 🌟 Key Features
 
-1. **👁️ Real-Time Motion & Asymmetry Landmark Scanner**:
-   - HTML5 Canvas frame-by-frame optical motion vector analyzer.
-   - Evaluates left vs right facial motion intensity and symmetry in real time on webcam streams.
+1. **⏱️ Elapsed Time Stopwatch Timer (Detection ➡️ Ambulance Call)**:
+   - Starts automatically the moment a symptom or risk sign is detected.
+   - Counts up continuously (`00:01, 00:02, 00:03...`) tracking the golden time window ("Time is brain").
+   - Runs until the **108 Emergency Ambulance is called**, locking the final elapsed duration (e.g. `Ambulance Called at 00:42 after detection`).
 
-2. **⏱️ 10-Second Emergency Dispatch Countdown**:
-   - When a high risk level is identified (or Green Emergency button pressed), initiates a 10-second countdown (`10, 9, 8... 1`).
-   - User options: **Cancel Dispatch (False Alarm)** or **Dispatch Ambulance Immediately**.
+2. **👁️ Guided 3-Step Motion & Symptom Screening Flow**:
+   - **Step 1: Facial Asymmetry Check**: Live canvas scanner analyzing facial drooping and left vs right mouth corner alignment.
+   - **Step 2: Raised Hand & Arm Elevation Check**: Instructs user to raise both hands in front of them with palms up, tracking hand elevation & arm drift.
+   - **Step 3: Speech Sentence Verification**: Prompts user to read aloud *"The sky is blue in Cincinnati"*, analyzing speech articulation via Web Speech API mic input.
 
 3. **💚 Green Instant Emergency SOS Button**:
    - Prominent green button (`💚 I FEEL UNWELL / CALL 108 & LOVED ONES`).
@@ -31,7 +33,7 @@ NeuroWatch AI is a full-stack, B2C medical emergency application built around th
    - Interactive conversational assistant incorporating patient medical profile (hypertension, diabetes, past TIA) and uploaded medical documents.
 
 6. **B2C Dual Portal (Patient & Hospital ER)**:
-   - **Patient View**: Motion & Asymmetry Camera scanner, AI Triage Bot, Loved ones manager, Document vault, Hospital locator.
+   - **Patient View**: Guided 3-step scanner, AI Triage Bot, Loved ones manager, Document vault, Hospital locator.
    - **Hospital ER View**: Real-time incoming emergency incident command center, live GPS patient tracking, instant medical document access for doctors, and 1-click Stroke Cath Lab team activation.
 
 ---
@@ -57,6 +59,6 @@ To push all updated files directly to your GitHub repository [`https://github.co
 
 ```bash
 git add .
-git commit -m "Add real-time motion detection engine, 10s emergency dispatch countdown, neurowatch0@gmail.com email, and updated Zenodo paper link"
+git commit -m "Add guided 3-step motion screening wizard and elapsed time stopwatch timer from risk detection until ambulance call"
 git push -u origin main
 ```

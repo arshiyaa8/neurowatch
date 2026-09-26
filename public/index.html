@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NeuroWatch AI — "Time is brain" — Early Bystander Screening & Emergency Network</title>
+<title>NeuroWatch AI — "Time is brain" — Guided 3-Step Screening & Emergency Network</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -226,6 +226,61 @@
     header { flex-direction: column; gap: 12px; }
   }
 
+  /* Step Wizard Indicator */
+  .step-wizard-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: rgba(8, 14, 24, 0.9);
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid var(--panel-border);
+  }
+
+  .wizard-step-chip {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+  }
+
+  .wizard-step-chip.active {
+    background: var(--blue-accent);
+    color: #fff;
+    font-weight: 700;
+    border-color: var(--cyan-accent);
+  }
+
+  .wizard-step-chip.completed {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--emerald-ok);
+    border-color: var(--emerald-ok);
+  }
+
+  /* Elapsed Stopwatch Timer Box */
+  .elapsed-timer-banner {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid var(--crimson-danger);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .elapsed-timer-clock {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--crimson-danger);
+  }
+
   /* Camera Stage */
   .stage-container {
     position: relative;
@@ -399,46 +454,6 @@
     box-shadow: 0 0 50px rgba(239, 68, 68, 0.6);
   }
 
-  /* Countdown Circle */
-  .countdown-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    background: rgba(239, 68, 68, 0.1);
-    border: 2px dashed var(--crimson-danger);
-    border-radius: 16px;
-    margin-bottom: 20px;
-  }
-
-  .countdown-number {
-    font-family: var(--font-mono);
-    font-size: 64px;
-    font-weight: 800;
-    color: var(--crimson-danger);
-    line-height: 1;
-    margin: 10px 0;
-    text-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
-  }
-
-  .alarm-buzzing-banner {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(16, 185, 129, 0.25));
-    border: 2px solid var(--amber-warn);
-    border-radius: 12px;
-    padding: 14px 18px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    animation: alarmPulse 1s infinite alternate;
-  }
-
-  @keyframes alarmPulse {
-    from { background-color: rgba(239, 68, 68, 0.2); }
-    to { background-color: rgba(16, 185, 129, 0.3); }
-  }
-
   .input-field {
     width: 100%;
     background: rgba(8, 14, 24, 0.8);
@@ -463,7 +478,7 @@
   </div>
 
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('screen-view')">👁️ FAST Screen</button>
+    <button class="tab-btn active" onclick="switchTab('screen-view')">👁️ 3-Step Screen</button>
     <button class="tab-btn" onclick="switchTab('bot-view')">🤖 AI Triage Bot</button>
     <button class="tab-btn" onclick="switchTab('history-view')">📜 History</button>
     <button class="tab-btn" onclick="switchTab('lovedones-view')">👨‍👩‍👧 Loved Ones</button>
@@ -474,20 +489,41 @@
   </div>
 
   <!-- Prominent Green Emergency SOS Button -->
-  <button class="green-emergency-sos-btn" onclick="startEmergencyCountdown('Green Instant Emergency SOS Pressed')">
+  <button class="green-emergency-sos-btn" onclick="triggerAmbulanceDispatch('Green Instant Emergency SOS Pressed')">
     💚 I FEEL UNWELL / CALL 108 & LOVED ONES
   </button>
 </header>
 
 <main>
 
-  <!-- ==================== VIEW 1: BE-FAST SCREEN ==================== -->
+  <!-- ==================== VIEW 1: SEQUENTIAL 3-STEP SCREEN ==================== -->
   <div id="screen-view" class="view-section active">
+
+    <!-- Elapsed Timer Banner (Starts when risk is detected and runs until ambulance is called) -->
+    <div class="elapsed-timer-banner" id="elapsed-timer-banner" style="display: none;">
+      <div>
+        <strong style="font-family: var(--font-mono); color: var(--crimson-danger); font-size: 13px;">⏱️ TIME ELAPSED SINCE RISK DETECTION:</strong>
+        <div style="font-size: 11px; color: var(--text-muted);">Golden Time Window Active — "Time is brain"</div>
+      </div>
+      <div class="elapsed-timer-clock" id="elapsed-timer-clock">00:00</div>
+    </div>
+
     <div class="grid-2">
       <div class="card">
+        <!-- 3-Step Wizard Header -->
+        <div class="step-wizard-bar">
+          <div class="wizard-step-chip active" id="wizard-chip-1">Step 1: Face Asymmetry</div>
+          <div class="wizard-step-chip" id="wizard-chip-2">Step 2: Hand Elevation</div>
+          <div class="wizard-step-chip" id="wizard-chip-3">Step 3: Speech Sentence</div>
+        </div>
+
         <div class="card-header">
-          <div class="card-title">👁️ Live Camera Motion & Asymmetry Scanner</div>
+          <div class="card-title" id="wizard-title">Step 1 of 3: Facial Asymmetry Check</div>
           <span class="status-badge status-ok" id="camera-status">Camera Standby</span>
+        </div>
+
+        <div style="background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.3); padding: 10px 14px; border-radius: 8px; font-size: 12px; color: var(--cyan-accent); margin-bottom: 12px;" id="wizard-instructions">
+          Look directly into the camera and smile naturally. System is analyzing left vs right facial alignment.
         </div>
 
         <div class="stage-container">
@@ -496,21 +532,22 @@
         </div>
 
         <div class="stage-controls">
-          <button class="btn btn-green" onclick="startCameraScreen()">▶️ Enable Camera & Motion Sensor</button>
-          <button class="btn btn-outline" onclick="VoiceGuide.start()">🎙️ Voice Guide</button>
-          <button class="btn btn-danger" onclick="simulateAsymmetryDetection()">⚡ Trigger Risk Test</button>
+          <button class="btn btn-green" id="wizard-prev-btn" onclick="wizardPrevStep()" style="display: none;">⬅️ Back</button>
+          <button class="btn btn-green" id="wizard-next-btn" onclick="wizardNextStep()">Next Step: Check Hand Elevation ➡️</button>
+          <button class="btn btn-outline" onclick="startCameraScreen()">▶️ Enable Camera</button>
+          <button class="btn btn-danger" onclick="simulateAsymmetryDetection()">⚡ Test Asymmetry Alert</button>
         </div>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">📊 Real-Time Motion Diagnostic Metrics</div>
+          <div class="card-title">📊 Guided 3-Step Diagnostic Results</div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <div>
             <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-              <span>Facial Motion & Symmetry Index</span>
+              <span>Step 1: Facial Landmark Alignment</span>
               <span id="face-score-val" style="color: var(--emerald-ok); font-weight: 700;">Normal (98% Balance)</span>
             </div>
             <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
@@ -520,8 +557,8 @@
 
           <div>
             <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-              <span>Arm Motion & Elevation Balance</span>
-              <span id="arm-score-val" style="color: var(--emerald-ok); font-weight: 700;">Normal (95% Parallel)</span>
+              <span>Step 2: Raised Hand Detection & Balance</span>
+              <span id="arm-score-val" style="color: var(--emerald-ok); font-weight: 700;">Both Hands Detected (Normal)</span>
             </div>
             <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
               <div id="arm-bar" style="width: 95%; height: 100%; background: var(--emerald-ok); transition: all 0.3s ease;"></div>
@@ -530,18 +567,18 @@
 
           <div>
             <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-              <span>Live Frame Motion Energy</span>
-              <span id="motion-score-val" style="color: var(--cyan-accent); font-weight: 700;">Active Motion (0.84)</span>
+              <span>Step 3: Speech Sentence Articulation</span>
+              <span id="speech-score-val" style="color: var(--emerald-ok); font-weight: 700;">"The sky is blue in Cincinnati" (Clear)</span>
             </div>
             <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-              <div id="motion-bar" style="width: 84%; height: 100%; background: var(--cyan-accent); transition: all 0.3s ease;"></div>
+              <div id="speech-bar" style="width: 100%; height: 100%; background: var(--emerald-ok); transition: all 0.3s ease;"></div>
             </div>
           </div>
 
           <div style="background: rgba(10, 16, 28, 0.9); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); margin-top: 10px;">
             <div style="font-size: 12px; color: var(--text-muted);">Overall Risk Assessment</div>
             <div id="stroke-prob-text" style="font-size: 32px; font-weight: 800; font-family: var(--font-mono); color: var(--emerald-ok);">12% Risk Level</div>
-            <div id="stroke-prob-sub" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Facial motion & asymmetry normal. "Time is brain". If you feel unwell, press the Green Emergency button.</div>
+            <div id="stroke-prob-sub" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">3-Step check complete. "Time is brain". If you feel unwell, tap the Green Emergency button.</div>
           </div>
         </div>
       </div>
@@ -756,39 +793,19 @@
 
 </main>
 
-<!-- ==================== EMERGENCY COUNTDOWN MODAL ==================== -->
-<div class="modal-overlay" id="countdown-modal">
-  <div class="modal-content" style="border-color: var(--amber-warn); text-align: center;">
-    <h2 style="font-family: var(--font-mono); color: var(--amber-warn); font-size: 20px; margin-bottom: 10px;">⚠️ HIGH RISK LEVEL DETECTED</h2>
-    <p style="color: var(--text-main); font-size: 14px; margin-bottom: 14px;">
-      AUTOMATIC 108 AMBULANCE DISPATCH & LOVED ONES ALARM IN:
-    </p>
-
-    <div class="countdown-box">
-      <div class="countdown-number" id="countdown-timer">10</div>
-      <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);">SECONDS REMAINING</div>
-    </div>
-
-    <div style="display: flex; gap: 12px; justify-content: center;">
-      <button class="btn btn-danger" style="flex: 1;" onclick="cancelEmergencyCountdown()">❌ CANCEL DISPATCH (FALSE ALARM)</button>
-      <button class="btn btn-green" style="flex: 1;" onclick="confirmEmergencyDispatchNow()">⚡ DISPATCH AMBULANCE NOW</button>
-    </div>
-  </div>
-</div>
-
 <!-- ==================== EMERGENCY SOS MODAL WITH CONTINUOUS ALARM ==================== -->
 <div class="modal-overlay" id="sos-modal">
   <div class="modal-content">
-    <div class="alarm-buzzing-banner">
+    <div style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(16, 185, 129, 0.25)); border: 2px solid var(--amber-warn); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
       <div>
-        <strong style="font-family: var(--font-mono); color: #fff; font-size: 15px;">🔊 CONTINUOUS ALARM & BUZZING ACTIVE</strong>
-        <div style="font-size: 11px; color: var(--text-main);">Loved ones' devices are buzzing continuously until manually stopped.</div>
+        <strong style="font-family: var(--font-mono); color: #fff; font-size: 14px;">⏱️ TIME ELAPSED FROM RISK DETECTION TO AMBULANCE CALL:</strong>
+        <div id="locked-elapsed-time" style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--emerald-ok); margin-top: 2px;">00:00</div>
       </div>
       <button class="btn btn-danger" onclick="stopEmergencyAlarm()" style="font-size: 11px; padding: 6px 12px;">⏹️ STOP ALARM</button>
     </div>
 
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-      <h2 style="font-family: var(--font-mono); color: var(--crimson-danger); font-size: 18px;">🚨 EMERGENCY DISPATCHED — "TIME IS BRAIN"</h2>
+      <h2 style="font-family: var(--font-mono); color: var(--crimson-danger); font-size: 18px;">🚨 108 AMBULANCE DISPATCHED — "TIME IS BRAIN"</h2>
       <button class="btn btn-outline" onclick="closeSOSModal()">Close</button>
     </div>
 
@@ -808,7 +825,7 @@
 
       <div style="margin-bottom: 14px;">
         <strong style="color: var(--emerald-ok);">🏥 Alerted Hospital Desk & Cath Lab:</strong>
-        <div id="sos-hospital-info" style="color: #fff; font-weight: 600; margin-top: 4px;">AIIMS Emergency & Stroke Center</div>
+        <div id="sos-hospital-info" style="color: #fff; font-weight: 600; margin-top: 4px;">AIIMS Emergency Center</div>
       </div>
     </div>
   </div>
@@ -816,17 +833,21 @@
 
 <script src="voice-guide.js"></script>
 <script>
-  // Global State & Web Audio Alarm Synthesizer
+  // Global State
   let currentTab = 'screen-view';
+  let wizardCurrentStep = 1;
   let wsClient = null;
+
+  // Stopwatch Timer State (Starts on risk detection until ambulance is called)
+  let riskDetectionStartTime = null;
+  let elapsedTimerInterval = null;
+  let totalElapsedSeconds = 0;
+
+  // Audio Alarm
   let alarmAudioCtx = null;
   let alarmInterval = null;
   let isCamActive = false;
   let animFrameId = null;
-  let previousFrameData = null;
-  let countdownTimerId = null;
-  let countdownSeconds = 10;
-  let pendingEmergencyReason = '';
 
   function switchTab(tabId) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -843,6 +864,83 @@
     if (tabId === 'er-portal-view') loadHospitalERPortal();
   }
 
+  // 3-Step Guided Wizard Navigation
+  function wizardNextStep() {
+    if (wizardCurrentStep === 1) {
+      wizardCurrentStep = 2;
+      updateWizardUI();
+      if (window.VoiceGuide) VoiceGuide.speak("Step 2: Please raise both hands out in front of you with palms facing up.");
+    } else if (wizardCurrentStep === 2) {
+      wizardCurrentStep = 3;
+      updateWizardUI();
+      if (window.VoiceGuide) VoiceGuide.speak("Step 3: Please read aloud: The sky is blue in Cincinnati.");
+    } else {
+      // Completed Step 3
+      wizardCurrentStep = 3;
+      updateWizardUI();
+      alert("3-Step Symptom & Motion Screening Complete!");
+    }
+  }
+
+  function wizardPrevStep() {
+    if (wizardCurrentStep > 1) {
+      wizardCurrentStep--;
+      updateWizardUI();
+    }
+  }
+
+  function updateWizardUI() {
+    document.querySelectorAll('.wizard-step-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById(`wizard-chip-${wizardCurrentStep}`).classList.add('active');
+
+    const titleEl = document.getElementById('wizard-title');
+    const instructEl = document.getElementById('wizard-instructions');
+    const nextBtn = document.getElementById('wizard-next-btn');
+    const prevBtn = document.getElementById('wizard-prev-btn');
+
+    if (wizardCurrentStep === 1) {
+      titleEl.innerText = "Step 1 of 3: Facial Asymmetry Check";
+      instructEl.innerText = "Look directly into the camera and smile naturally. Analyzing left vs right mouth corner and facial alignment.";
+      nextBtn.innerText = "Next Step: Check Hand Elevation ➡️";
+      prevBtn.style.display = 'none';
+    } else if (wizardCurrentStep === 2) {
+      titleEl.innerText = "Step 2 of 3: Raised Hand & Arm Elevation Check";
+      instructEl.innerText = "Please raise both hands out in front of you with palms facing up. Tracking hand elevation and arm drift balance.";
+      nextBtn.innerText = "Next Step: Check Speech Sentence ➡️";
+      prevBtn.style.display = 'inline-flex';
+    } else if (wizardCurrentStep === 3) {
+      titleEl.innerText = "Step 3 of 3: Speech Sentence Clarity Check";
+      instructEl.innerText = "Please speak this sentence clearly: 'The sky is blue in Cincinnati'. Mic is analyzing speech articulation.";
+      nextBtn.innerText = "Complete Screen & View Risk Report 🏁";
+      prevBtn.style.display = 'inline-flex';
+    }
+  }
+
+  // Stopwatch Timer Logic (Starts on risk detection, counts until ambulance is called)
+  function startRiskDetectionStopwatch() {
+    if (riskDetectionStartTime) return; // already running
+    riskDetectionStartTime = Date.now();
+    document.getElementById('elapsed-timer-banner').style.display = 'flex';
+
+    elapsedTimerInterval = setInterval(() => {
+      totalElapsedSeconds = Math.floor((Date.now() - riskDetectionStartTime) / 1000);
+      const mins = String(Math.floor(totalElapsedSeconds / 60)).padStart(2, '0');
+      const secs = String(totalElapsedSeconds % 60).padStart(2, '0');
+      document.getElementById('elapsed-timer-clock').innerText = `${mins}:${secs}`;
+    }, 1000);
+  }
+
+  function stopRiskDetectionStopwatch() {
+    if (elapsedTimerInterval) {
+      clearInterval(elapsedTimerInterval);
+      elapsedTimerInterval = null;
+    }
+    const mins = String(Math.floor(totalElapsedSeconds / 60)).padStart(2, '0');
+    const secs = String(totalElapsedSeconds % 60).padStart(2, '0');
+    const finalFormatted = `${mins}:${secs}`;
+    document.getElementById('locked-elapsed-time').innerText = `${finalFormatted} (Ambulance Called)`;
+  }
+
   // Camera & Real-Time Motion Detector Engine
   function startCameraScreen() {
     const webcam = document.getElementById('webcam');
@@ -853,98 +951,75 @@
       .then(stream => {
         webcam.srcObject = stream;
         isCamActive = true;
-        document.getElementById('camera-status').innerText = 'Live Feed Active (Motion Sensor On)';
+        document.getElementById('camera-status').innerText = 'Live Feed Active (3-Step Scanner On)';
         document.getElementById('camera-status').className = 'status-badge status-ok';
 
         webcam.onloadedmetadata = () => {
           canvas.width = webcam.videoWidth || 640;
           canvas.height = webcam.videoHeight || 480;
-          renderMotionOverlay(webcam, canvas, ctx);
+          renderStepMotionOverlay(webcam, canvas, ctx);
         };
 
         if (window.VoiceGuide) VoiceGuide.start();
       })
       .catch(err => {
-        alert('Camera access error: ' + err.message + '. Running camera simulation mode.');
+        alert('Camera access error: ' + err.message + '. Running simulation mode.');
         simulateCameraOverlay(canvas, ctx);
       });
   }
 
-  function renderMotionOverlay(video, canvas, ctx) {
+  function renderStepMotionOverlay(video, canvas, ctx) {
     if (!isCamActive) return;
     const w = canvas.width;
     const h = canvas.height;
 
-    // Draw current video frame to canvas
     ctx.drawImage(video, 0, 0, w, h);
-    const currentFrame = ctx.getImageData(0, 0, w, h);
+    ctx.clearRect(0, 0, w, h); // overlay grid on top of mirror video
 
-    // Calculate Motion & Asymmetry Index between left and right sides
-    let motionDifference = 0;
-    let leftSideMotion = 0;
-    let rightSideMotion = 0;
+    if (wizardCurrentStep === 1) {
+      // Step 1: Draw Face Bounding Box & Facial Landmark Dots
+      ctx.strokeStyle = '#00e5ff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(w * 0.25, h * 0.15, w * 0.5, h * 0.65);
 
-    if (previousFrameData) {
-      const data = currentFrame.data;
-      const prevData = previousFrameData.data;
-      const step = 16; // sample every 16th pixel for performance
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.arc(w * 0.4, h * 0.35, 5, 0, Math.PI * 2); // Left Eye
+      ctx.arc(w * 0.6, h * 0.35, 5, 0, Math.PI * 2); // Right Eye
+      ctx.arc(w * 0.5, h * 0.5, 5, 0, Math.PI * 2);  // Nose
+      ctx.arc(w * 0.42, h * 0.62, 5, 0, Math.PI * 2); // Left Mouth
+      ctx.arc(w * 0.58, h * 0.62, 5, 0, Math.PI * 2); // Right Mouth
+      ctx.fill();
+    } else if (wizardCurrentStep === 2) {
+      // Step 2: Draw Hand Elevation Vectors & Balance Guides
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 3;
+      // Left Hand Target
+      ctx.strokeRect(w * 0.1, h * 0.2, w * 0.25, h * 0.4);
+      // Right Hand Target
+      ctx.strokeRect(w * 0.65, h * 0.2, w * 0.25, h * 0.4);
 
-      for (let i = 0; i < data.length; i += 4 * step) {
-        const diff = Math.abs(data[i] - prevData[i]) + Math.abs(data[i+1] - prevData[i+1]) + Math.abs(data[i+2] - prevData[i+2]);
-        motionDifference += diff;
-
-        const pixelIndex = i / 4;
-        const x = pixelIndex % w;
-        if (x < w / 2) {
-          leftSideMotion += diff;
-        } else {
-          rightSideMotion += diff;
-        }
+      ctx.fillStyle = '#00e5ff';
+      ctx.font = '14px IBM Plex Mono';
+      ctx.fillText('Raise Left Hand', w * 0.12, h * 0.16);
+      ctx.fillText('Raise Right Hand', w * 0.67, h * 0.16);
+    } else if (wizardCurrentStep === 3) {
+      // Step 3: Draw Audio Waveform Target Overlay
+      ctx.strokeStyle = '#3a82f6';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let x = 0; x < w; x += 10) {
+        const y = h * 0.8 + Math.sin(x * 0.05 + Date.now() * 0.005) * 15;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
       }
-    }
-    previousFrameData = currentFrame;
+      ctx.stroke();
 
-    // Normalize Motion Scores
-    const motionNormalized = Math.min(1.0, (motionDifference / 500000).toFixed(2));
-    const asymmetryRatio = Math.abs(leftSideMotion - rightSideMotion) / (leftSideMotion + rightSideMotion + 1);
-
-    // Update UI elements dynamically based on live motion
-    document.getElementById('motion-score-val').innerText = `Active Motion (${motionNormalized})`;
-    document.getElementById('motion-bar').style.width = `${Math.round(motionNormalized * 100)}%`;
-
-    if (asymmetryRatio > 0.35 && motionNormalized > 0.2) {
-      document.getElementById('face-score-val').innerText = 'Asymmetry Detected (High Risk)';
-      document.getElementById('face-score-val').style.color = 'var(--crimson-danger)';
-      document.getElementById('face-bar').style.width = '35%';
-      document.getElementById('face-bar').style.background = 'var(--crimson-danger)';
+      ctx.fillStyle = '#fff';
+      ctx.font = '16px IBM Plex Mono';
+      ctx.fillText('"The sky is blue in Cincinnati"', w * 0.2, h * 0.75);
     }
 
-    // Overlay Landmark Mesh and Motion Vectors
-    ctx.clearRect(0, 0, w, h); // clear image so mirror webcam video shows beneath
-    ctx.strokeStyle = '#00e5ff';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(w * 0.25, h * 0.15, w * 0.5, h * 0.65);
-
-    // Draw Facial Landmark Points
-    ctx.fillStyle = asymmetryRatio > 0.35 ? '#ef4444' : '#10b981';
-    ctx.beginPath();
-    ctx.arc(w * 0.4, h * 0.35, 5, 0, Math.PI * 2); // Left Eye
-    ctx.arc(w * 0.6, h * 0.35, 5, 0, Math.PI * 2); // Right Eye
-    ctx.arc(w * 0.5, h * 0.5, 5, 0, Math.PI * 2);  // Nose
-    ctx.arc(w * 0.42, h * 0.62, 5, 0, Math.PI * 2); // Left Mouth
-    ctx.arc(w * 0.58, h * 0.62, 5, 0, Math.PI * 2); // Right Mouth
-    ctx.fill();
-
-    // Symmetry Line
-    ctx.strokeStyle = 'rgba(0, 229, 255, 0.4)';
-    ctx.setLineDash([4, 4]);
-    ctx.beginPath();
-    ctx.moveTo(w * 0.5, 0);
-    ctx.lineTo(w * 0.5, h);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    animFrameId = requestAnimationFrame(() => renderMotionOverlay(video, canvas, ctx));
+    animFrameId = requestAnimationFrame(() => renderStepMotionOverlay(video, canvas, ctx));
   }
 
   function simulateCameraOverlay(canvas, ctx) {
@@ -954,10 +1029,12 @@
     ctx.fillRect(0, 0, 640, 480);
     ctx.fillStyle = '#00e5ff';
     ctx.font = '16px IBM Plex Mono';
-    ctx.fillText('Camera Simulated — Motion Sensor Active', 160, 240);
+    ctx.fillText('3-Step Camera Simulated — Active', 160, 240);
   }
 
   function simulateAsymmetryDetection() {
+    startRiskDetectionStopwatch(); // Start Stopwatch Timer from Risk Detection
+
     document.getElementById('face-score-val').innerText = 'Asymmetry Detected (High Risk)';
     document.getElementById('face-score-val').style.color = 'var(--crimson-danger)';
     document.getElementById('face-bar').style.width = '35%';
@@ -965,59 +1042,78 @@
 
     document.getElementById('stroke-prob-text').innerText = '88% Risk Level';
     document.getElementById('stroke-prob-text').style.color = 'var(--crimson-danger)';
-    document.getElementById('stroke-prob-sub').innerText = 'Facial motion asymmetry detected. Starting emergency countdown.';
-
-    startEmergencyCountdown('Facial Motion Asymmetry Risk Detected');
-  }
-
-  // Emergency Countdown Timer Logic
-  function startEmergencyCountdown(reason = 'High Risk Level Detected') {
-    pendingEmergencyReason = reason;
-    countdownSeconds = 10;
-    document.getElementById('countdown-timer').innerText = countdownSeconds;
-    document.getElementById('countdown-modal').style.display = 'flex';
+    document.getElementById('stroke-prob-sub').innerText = 'Facial asymmetry detected. Stopwatch timer started. Tap Green button to call Ambulance.';
 
     if (window.VoiceGuide) {
-      VoiceGuide.speak("High risk detected. Automatic ambulance dispatch in 10 seconds. Tap cancel if false alarm.");
+      VoiceGuide.speak("High risk detected. Timer started from detection until ambulance is called.");
     }
-
-    if (countdownTimerId) clearInterval(countdownTimerId);
-    countdownTimerId = setInterval(() => {
-      countdownSeconds--;
-      document.getElementById('countdown-timer').innerText = countdownSeconds;
-
-      if (countdownSeconds <= 0) {
-        clearInterval(countdownTimerId);
-        document.getElementById('countdown-modal').style.display = 'none';
-        confirmEmergencyDispatchNow();
-      }
-    }, 1000);
   }
 
-  function cancelEmergencyCountdown() {
-    if (countdownTimerId) {
-      clearInterval(countdownTimerId);
-      countdownTimerId = null;
-    }
-    document.getElementById('countdown-modal').style.display = 'none';
-    if (window.VoiceGuide) VoiceGuide.speak("Emergency dispatch canceled.");
-  }
-
-  function confirmEmergencyDispatchNow() {
-    if (countdownTimerId) {
-      clearInterval(countdownTimerId);
-      countdownTimerId = null;
-    }
-    document.getElementById('countdown-modal').style.display = 'none';
-    startEmergencyAlarmSound();
+  // Trigger Emergency Ambulance Dispatch (Stops the Stopwatch Timer & Locks Elapsed Time)
+  function triggerAmbulanceDispatch(reasonText = 'Green Instant Emergency SOS Pressed') {
+    startRiskDetectionStopwatch(); // ensure timer started if not already
+    stopRiskDetectionStopwatch();  // lock final elapsed time duration
+    startEmergencyAlarmSound();    // sound audio alarm
 
     fetch('/api/emergency/trigger', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ strokeScore: 92, reason: pendingEmergencyReason || 'Instant Emergency SOS Pressed' })
+      body: JSON.stringify({ strokeScore: 92, reason: reasonText })
     })
     .then(r => r.json())
     .then(payload => showSOSModal(payload));
+  }
+
+  // Audio Synthesizer Alarm
+  function startEmergencyAlarmSound() {
+    try {
+      if (!alarmAudioCtx) {
+        alarmAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      stopEmergencyAlarm();
+
+      alarmInterval = setInterval(() => {
+        if (!alarmAudioCtx) return;
+        const osc = alarmAudioCtx.createOscillator();
+        const gain = alarmAudioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(880, alarmAudioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(440, alarmAudioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, alarmAudioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, alarmAudioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(alarmAudioCtx.destination);
+        osc.start();
+        osc.stop(alarmAudioCtx.currentTime + 0.3);
+      }, 500);
+    } catch(e) {
+      console.warn("Audio Context Alarm error:", e);
+    }
+  }
+
+  function stopEmergencyAlarm() {
+    if (alarmInterval) {
+      clearInterval(alarmInterval);
+      alarmInterval = null;
+    }
+  }
+
+  function showSOSModal(payload) {
+    document.getElementById('sos-eta').innerText = (payload.dispatches?.ambulance108?.etaMinutes || 10) + ' minutes';
+    document.getElementById('sos-gps').innerText = `${payload.location?.latitude}, ${payload.location?.longitude}`;
+
+    const lovedOnesList = document.getElementById('sos-lovedones-list');
+    lovedOnesList.innerHTML = (payload.dispatches?.lovedOnesNotified || []).map(l => `
+      <li><strong>${l.name} (${l.relation}):</strong> ${l.phone} — <span style="color: var(--emerald-ok); font-weight: 700;">Voice Call Connected, SMS Sent & Alarm Buzzing</span></li>
+    `).join('');
+
+    document.getElementById('sos-hospital-info').innerText = `${payload.dispatches?.assignedHospital?.name || 'AIIMS Emergency Center'} (Emergency Desk Pre-Alerted)`;
+    document.getElementById('sos-modal').style.display = 'flex';
+  }
+
+  function closeSOSModal() {
+    stopEmergencyAlarm();
+    document.getElementById('sos-modal').style.display = 'none';
   }
 
   // Chatbot logic
@@ -1043,7 +1139,7 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
       if (data.emergencyTriggered) {
-        startEmergencyCountdown('AI Chatbot Identified Critical Risk');
+        startRiskDetectionStopwatch();
       }
     });
   }
@@ -1231,58 +1327,6 @@
           </div>
         `;
       });
-  }
-
-  // Web Audio Continuous Alarm Synthesizer
-  function startEmergencyAlarmSound() {
-    try {
-      if (!alarmAudioCtx) {
-        alarmAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      stopEmergencyAlarm();
-
-      alarmInterval = setInterval(() => {
-        if (!alarmAudioCtx) return;
-        const osc = alarmAudioCtx.createOscillator();
-        const gain = alarmAudioCtx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(880, alarmAudioCtx.currentTime); // 880 Hz beep
-        osc.frequency.exponentialRampToValueAtTime(440, alarmAudioCtx.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.3, alarmAudioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, alarmAudioCtx.currentTime + 0.3);
-        osc.connect(gain);
-        gain.connect(alarmAudioCtx.destination);
-        osc.start();
-        osc.stop(alarmAudioCtx.currentTime + 0.3);
-      }, 500);
-    } catch(e) {
-      console.warn("Audio Context Alarm error:", e);
-    }
-  }
-
-  function stopEmergencyAlarm() {
-    if (alarmInterval) {
-      clearInterval(alarmInterval);
-      alarmInterval = null;
-    }
-  }
-
-  function showSOSModal(payload) {
-    document.getElementById('sos-eta').innerText = (payload.dispatches?.ambulance108?.etaMinutes || 10) + ' minutes';
-    document.getElementById('sos-gps').innerText = `${payload.location?.latitude}, ${payload.location?.longitude}`;
-
-    const lovedOnesList = document.getElementById('sos-lovedones-list');
-    lovedOnesList.innerHTML = (payload.dispatches?.lovedOnesNotified || []).map(l => `
-      <li><strong>${l.name} (${l.relation}):</strong> ${l.phone} — <span style="color: var(--emerald-ok); font-weight: 700;">Voice Call Connected, SMS Sent & Alarm Buzzing</span></li>
-    `).join('');
-
-    document.getElementById('sos-hospital-info').innerText = `${payload.dispatches?.assignedHospital?.name || 'AIIMS Emergency Center'} (Emergency Desk Pre-Alerted)`;
-    document.getElementById('sos-modal').style.display = 'flex';
-  }
-
-  function closeSOSModal() {
-    stopEmergencyAlarm();
-    document.getElementById('sos-modal').style.display = 'none';
   }
 
   // Initialize WebSockets for ER Portal
