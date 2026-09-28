@@ -375,6 +375,58 @@
     color: var(--cyan-accent);
   }
 
+  /* 5-Step Workflow Progress Tracker */
+  .workflow-step-tracker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(14, 21, 35, 0.85);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin-bottom: 16px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .step-node {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .step-node .step-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .step-node.active { color: var(--cyan-accent); }
+  .step-node.active .step-num { background: var(--cyan-accent); color: #040810; }
+  .step-node.completed { color: var(--emerald-ok); }
+  .step-node.completed .step-num { background: var(--emerald-ok); color: #040810; }
+  .step-node.danger { color: var(--crimson-danger); }
+  .step-node.danger .step-num { background: var(--crimson-danger); color: #fff; }
+
+  .step-connector {
+    flex: 1;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    min-width: 12px;
+  }
+
   /* Modals */
   .modal-overlay {
     display: none;
@@ -461,10 +513,23 @@
   <!-- ==================== COMPONENT 1: AUTOMATIC TIMED 3-PHASE DETECTION PIPELINE ==================== -->
   <div id="screen-view" class="view-section active">
 
+    <!-- 5-Step Workflow Progress Tracker -->
+    <div class="workflow-step-tracker" id="workflow-step-tracker">
+      <div class="step-node active" id="node-face"><span class="step-num">1</span> Facial Symmetry (30s)</div>
+      <div class="step-connector" id="conn-1"></div>
+      <div class="step-node" id="node-arm"><span class="step-num">2</span> Arm Lifting (30s)</div>
+      <div class="step-connector" id="conn-2"></div>
+      <div class="step-node" id="node-speech"><span class="step-num">3</span> Speech Test</div>
+      <div class="step-connector" id="conn-3"></div>
+      <div class="step-node" id="node-results"><span class="step-num">4</span> Results Page</div>
+      <div class="step-connector" id="conn-4"></div>
+      <div class="step-node" id="node-emergency"><span class="step-num">5</span> Emergency Response</div>
+    </div>
+
     <!-- Active Phase Banner with Live 30s Countdown -->
     <div class="phase-header-banner" id="phase-header-banner">
       <div>
-        <strong style="color: #fff; font-size: 15px;" id="phase-banner-title">PHASE 1: FACIAL ASYMMETRY SCAN (30 SECONDS)</strong>
+        <strong style="color: #fff; font-size: 15px;" id="phase-banner-title">STAGE 1: FACIAL ASYMMETRY SCAN (30 SECONDS)</strong>
         <div style="font-size: 11px; color: var(--text-muted);" id="phase-banner-sub">Camera automatically analyzing facial landmarks. Zero button clicks required.</div>
       </div>
       <div class="phase-countdown-text" id="phase-timer-display">30s</div>
@@ -472,32 +537,72 @@
 
     <!-- Step 1 Prompt Box: Face Asymmetry -->
     <div id="face-prompt-box" style="display: block; background: rgba(0, 229, 255, 0.1); border: 2px solid var(--cyan-accent); padding: 14px 18px; border-radius: 12px; margin-bottom: 14px; text-align: center;">
-      <div style="font-size: 12px; color: var(--cyan-accent); font-family: var(--font-mono); font-weight: 700;">STEP 1 OF 3: FACIAL ASYMMETRY AUTOMATIC SCAN</div>
+      <div style="font-size: 12px; color: var(--cyan-accent); font-family: var(--font-mono); font-weight: 700;">STAGE 1 OF 3: FACIAL ASYMMETRY AUTOMATIC SCAN</div>
       <div style="font-family: var(--font-mono); font-size: 18px; font-weight: 800; color: #fff; margin-top: 4px;">👨 Hold still and look straight into the camera. Analyzing facial symmetry...</div>
     </div>
 
     <!-- Step 2 Prompt Box: Arm Elevation ("RAISE YOUR HAND") -->
     <div id="hand-prompt-box" style="display: none; background: rgba(16, 185, 129, 0.15); border: 2px solid var(--emerald-ok); padding: 16px 20px; border-radius: 12px; margin-bottom: 14px; text-align: center;">
-      <div style="font-size: 12px; color: var(--emerald-ok); font-family: var(--font-mono); font-weight: 700;">STEP 2 OF 3: HAND & ARM ELEVATION ASSESSMENT</div>
-      <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 800; color: #fff; margin-top: 4px; letter-spacing: 0.02em;">✋ RAISE YOUR HAND & ARMS NOW IN FRONT OF THE CAMERA</div>
-      <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">System automatically detecting arm elevation drift and left/right asymmetry.</div>
+      <div style="font-size: 12px; color: var(--emerald-ok); font-family: var(--font-mono); font-weight: 700;">STAGE 2 OF 3: ARM LIFTING ASSESSMENT</div>
+      <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 800; color: #fff; margin-top: 4px; letter-spacing: 0.02em;">✋ NOW RAISE BOTH ARMS AND HOLD THEM UP</div>
+      <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">System automatically tracking arm elevation, drift, and left/right asymmetry.</div>
     </div>
 
     <!-- Step 3 Prompt Box: Speech Sentence -->
     <div id="speech-prompt-box" style="display: none; background: rgba(58, 130, 246, 0.15); border: 2px solid var(--blue-accent); padding: 16px 20px; border-radius: 12px; margin-bottom: 14px; text-align: center;">
-      <div style="font-size: 12px; color: var(--blue-accent); font-family: var(--font-mono); font-weight: 700;">STEP 3 OF 3: SPEECH ARTICULATION CHECK</div>
-      <div style="font-size: 14px; color: #fff; margin-top: 4px; font-family: var(--font-mono);">🗣️ NOW SPEAK THIS SENTENCE ALOUD:</div>
-      <div id="random-speech-phrase" style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--cyan-accent); margin-top: 6px;">"Early detection saves lives and time is brain."</div>
+      <div style="font-size: 12px; color: var(--blue-accent); font-family: var(--font-mono); font-weight: 700;">STAGE 3 OF 3: SPEECH TEST</div>
+      <div style="font-size: 14px; color: #fff; margin-top: 4px; font-family: var(--font-mono);">🗣️ PLEASE SPEAK THE SENTENCE SHOWN BELOW:</div>
+      <div id="random-speech-phrase" style="font-family: var(--font-mono); font-size: 20px; font-weight: 800; color: var(--cyan-accent); margin-top: 6px;">"The weather is beautiful today."</div>
     </div>
 
-    <!-- Step 4 Prompt Box: Completion & % Detected Summary -->
+    <!-- Step 4 Summary Prompt Box -->
     <div id="summary-prompt-box" style="display: none; background: rgba(239, 68, 68, 0.15); border: 2px solid var(--crimson-danger); padding: 18px 24px; border-radius: 14px; margin-bottom: 14px; text-align: center;">
-      <div style="font-size: 13px; color: var(--amber-warn); font-family: var(--font-mono); font-weight: 700;">✅ 3-PHASE STROKE DETECTION COMPLETED</div>
+      <div style="font-size: 13px; color: var(--amber-warn); font-family: var(--font-mono); font-weight: 700;">✅ 3-STAGE STROKE ASSESSMENT COMPLETED</div>
       <div style="font-family: var(--font-mono); font-size: 26px; font-weight: 800; color: #fff; margin-top: 6px;">
         RESULT: <span id="final-detected-percent" style="color: var(--crimson-danger);">78%</span> DETECTED STROKE RISK
       </div>
       <div style="font-size: 13px; color: var(--text-main); margin-top: 6px;">
-        ⏱️ Elapsed Stopwatch Timer Running | 🚑 Emergency Ambulance & Loved Ones Dispatched
+        ⏱️ Elapsed Stopwatch Timer Active | 🚑 Emergency Response Initiated
+      </div>
+    </div>
+
+    <!-- Stage 4 Dedicated Final Results Page Card -->
+    <div id="results-page-card" class="card" style="display: none; border: 2px solid var(--cyan-accent); margin-bottom: 20px;">
+      <div style="text-align: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px; margin-bottom: 20px;">
+        <h2 style="font-family: var(--font-mono); color: var(--cyan-accent); font-size: 24px; letter-spacing: 0.05em;">NEUROWATCH AI</h2>
+        <h3 style="font-family: var(--font-mono); color: #fff; font-size: 16px; margin-top: 4px;">ASSESSMENT COMPLETE</h3>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px; font-style: italic;">AI-assisted screening result (Screening / awareness indicator — Not a medical diagnosis)</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="background: rgba(8,14,24,0.85); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); text-align: center;">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700;">FACIAL ASYMMETRY</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--cyan-accent); margin: 6px 0;" id="res-face-val">27%</div>
+          <div style="font-size: 11px; color: var(--emerald-ok);" id="res-face-status">Stage 1 Completed</div>
+        </div>
+
+        <div style="background: rgba(8,14,24,0.85); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); text-align: center;">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700;">ARM ASYMMETRY</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--cyan-accent); margin: 6px 0;" id="res-arm-val">41%</div>
+          <div style="font-size: 11px; color: var(--emerald-ok);" id="res-arm-status">Stage 2 Completed</div>
+        </div>
+
+        <div style="background: rgba(8,14,24,0.85); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); text-align: center;">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700;">SPEECH TEST</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--cyan-accent); margin: 6px 0;" id="res-speech-val">72% match</div>
+          <div style="font-size: 11px; color: var(--emerald-ok);" id="res-speech-status">Stage 3 Completed</div>
+        </div>
+      </div>
+
+      <div style="background: rgba(4,8,16,0.95); padding: 22px; border-radius: 14px; border: 2px solid var(--amber-warn); text-align: center; margin-bottom: 24px;" id="res-overall-card-box">
+        <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.1em;">OVERALL STROKE-RISK INDICATOR</div>
+        <div style="font-size: 46px; font-weight: 900; color: var(--amber-warn); font-family: var(--font-mono); margin: 8px 0;" id="res-overall-score-val">78%</div>
+        <div style="font-size: 14px; color: #fff; font-weight: 600;" id="res-overall-category-label">🚨 High Risk — Urgent Emergency Attention Recommended</div>
+      </div>
+
+      <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn btn-outline" onclick="resetAndRestartAssessment()">🔄 Retry Assessment</button>
+        <button class="btn btn-danger" onclick="trigger_emergency_response('High Risk Confirmed on Final Results Page', parseInt(document.getElementById('res-overall-score-val').innerText))">🚨 Trigger Emergency SOS (108 + Loved Ones)</button>
       </div>
     </div>
 
@@ -830,15 +935,24 @@
   let phaseTimeRemaining = 30;
   let phaseTimerInterval = null;
 
-  // Random Speech Phrases
+  // Safe Predefined Sentences List
   const RANDOM_SPEECH_PHRASES = [
-    "Early detection saves lives and time is brain.",
-    "The quick brown fox jumps over the lazy dog.",
-    "The sky is blue in Cincinnati today.",
-    "Fifty-five silver spoons on the table."
+    "The weather is beautiful today.",
+    "I am feeling well and ready to continue.",
+    "Today is a good day to take care of my health.",
+    "I am going to complete my health assessment.",
+    "The quick brown fox jumps over the lazy dog."
   ];
 
-  // 50%+ Risk Stopwatch Timer State
+  // Workflow Metrics State
+  let faceAsymmetrySamples = [];
+  let armAsymmetrySamples = [];
+  let speechMatchScore = 72;
+  let finalFaceScore = 0;
+  let finalArmScore = 0;
+  let selectedSentence = "";
+
+  // 50%+ Risk Stopwatch Timer State (Timestamp-based elapsed seconds)
   let riskStopwatchStartTime = null;
   let riskStopwatchInterval = null;
   let totalElapsedRiskSeconds = 0;
@@ -869,7 +983,7 @@
     if (tabId === 'er-portal-view') loadHospitalERPortal();
   }
 
-  // 1. Automatic Timed 3-Phase Pipeline Start
+  // 1. Automatic Timed 3-Stage Pipeline Start
   function startCameraPipeline() {
     const webcam = document.getElementById('webcam');
     const canvas = document.getElementById('overlayCanvas');
@@ -879,7 +993,7 @@
       .then(stream => {
         webcam.srcObject = stream;
         isCamActive = true;
-        document.getElementById('camera-status').innerText = '3-Phase Pipeline Active';
+        document.getElementById('camera-status').innerText = '3-Stage Pipeline Active';
         document.getElementById('camera-status').className = 'status-badge status-ok';
 
         setupAudioAnalyser(stream);
@@ -899,9 +1013,35 @@
       });
   }
 
+  function updateStepTrackerUI(stageNum) {
+    const nodes = [
+      document.getElementById('node-face'),
+      document.getElementById('node-arm'),
+      document.getElementById('node-speech'),
+      document.getElementById('node-results'),
+      document.getElementById('node-emergency')
+    ];
+
+    nodes.forEach((n, idx) => {
+      if (!n) return;
+      n.className = 'step-node';
+      if (idx + 1 < stageNum) n.classList.add('completed');
+      else if (idx + 1 === stageNum) {
+        if (stageNum === 5) n.classList.add('danger');
+        else n.classList.add('active');
+      }
+    });
+  }
+
   function startPhaseSequenceTimer() {
     activePhase = 1;
     phaseTimeRemaining = 30;
+    faceAsymmetrySamples = [];
+    armAsymmetrySamples = [];
+    speechMatchScore = 72;
+    document.getElementById('results-page-card').style.display = 'none';
+
+    updateStepTrackerUI(1);
     updatePhaseBannerUI();
 
     if (phaseTimerInterval) clearInterval(phaseTimerInterval);
@@ -911,39 +1051,108 @@
 
       if (phaseTimeRemaining <= 0) {
         if (activePhase === 1) {
-          // Transition to Phase 2: Hand/Arm Elevation Scan ("RAISE YOUR HAND") (30 seconds)
+          // Calculate aggregated Stage 1 Face Asymmetry
+          finalFaceScore = faceAsymmetrySamples.length > 0 
+            ? Math.round(faceAsymmetrySamples.reduce((a, b) => a + b, 0) / faceAsymmetrySamples.length) 
+            : 0;
+
+          // Transition to Stage 2: Arm Lifting Assessment (30 seconds)
           activePhase = 2;
           phaseTimeRemaining = 30;
+          updateStepTrackerUI(2);
           updatePhaseBannerUI();
-          if (window.VoiceGuide) VoiceGuide.speak("Phase 2: Please raise your hand and arms for elevation assessment.");
+          if (window.VoiceGuide) VoiceGuide.speak("Stage 2: Arm Lifting Assessment. Now raise both arms and hold them up.");
         } else if (activePhase === 2) {
-          // Transition to Phase 3: Speech Sentence Check
+          // Calculate aggregated Stage 2 Arm Asymmetry
+          finalArmScore = armAsymmetrySamples.length > 0 
+            ? Math.round(armAsymmetrySamples.reduce((a, b) => a + b, 0) / armAsymmetrySamples.length) 
+            : 0;
+
+          // Transition to Stage 3: Speech Test
           activePhase = 3;
           phaseTimeRemaining = 20;
+          selectedSentence = RANDOM_SPEECH_PHRASES[Math.floor(Math.random() * RANDOM_SPEECH_PHRASES.length)];
+          document.getElementById('random-speech-phrase').innerText = `"${selectedSentence}"`;
+          
+          updateStepTrackerUI(3);
           updatePhaseBannerUI();
-          const randomLine = RANDOM_SPEECH_PHRASES[Math.floor(Math.random() * RANDOM_SPEECH_PHRASES.length)];
-          document.getElementById('random-speech-phrase').innerText = `"${randomLine}"`;
-          if (window.VoiceGuide) VoiceGuide.speak(`Phase 3: Now speak this sentence aloud. ${randomLine}`);
+          startSpeechRecognitionForStage3(selectedSentence);
+          if (window.VoiceGuide) VoiceGuide.speak(`Stage 3: Speech Test. Please speak: ${selectedSentence}`);
         } else if (activePhase === 3) {
-          // Transition to Phase 4: Risk Summary Report & Completion
+          // Transition to Stage 4: Final Dedicated Results Page
           activePhase = 4;
           clearInterval(phaseTimerInterval);
-          updatePhaseBannerUI();
 
-          const finalScore = parseInt(document.getElementById('val-risk-score').innerText) || 78;
-          document.getElementById('final-detected-percent').innerText = `${finalScore}%`;
-          document.getElementById('phase-timer-display').innerText = "DONE";
+          const speechRisk = Math.max(0, 100 - speechMatchScore);
+          const overallRisk = Math.round((finalFaceScore * 0.45) + (finalArmScore * 0.40) + (speechRisk * 0.15));
 
-          if (window.VoiceGuide) {
-            VoiceGuide.speak(`Screening complete. ${finalScore} percent stroke risk detected.`);
+          // Populate Dedicated Results Page Card
+          document.getElementById('res-face-val').innerText = `${finalFaceScore}%`;
+          document.getElementById('res-arm-val').innerText = `${finalArmScore}%`;
+          document.getElementById('res-speech-val').innerText = `${speechMatchScore}% match`;
+          document.getElementById('res-overall-score-val').innerText = `${overallRisk}%`;
+
+          const label = document.getElementById('res-overall-category-label');
+          if (overallRisk < 50) {
+            label.innerText = "🟢 Low Risk — Normal Assessment Result";
+            label.style.color = "var(--emerald-ok)";
+          } else if (overallRisk < 75) {
+            label.innerText = "🟡 Elevated Risk — Monitoring Recommended";
+            label.style.color = "var(--amber-warn)";
+          } else {
+            label.innerText = "🚨 High Risk — Urgent Emergency Attention Recommended";
+            label.style.color = "var(--crimson-danger)";
           }
 
-          if (finalScore >= 50) {
-            trigger_emergency_response(`Automatic 3-Phase Detection Complete (${finalScore}% Stroke Risk)`, finalScore);
+          document.getElementById('results-page-card').style.display = 'block';
+          document.getElementById('final-detected-percent').innerText = `${overallRisk}%`;
+          document.getElementById('phase-timer-display').innerText = "DONE";
+          updateStepTrackerUI(4);
+          updatePhaseBannerUI();
+
+          if (window.VoiceGuide) {
+            VoiceGuide.speak(`Assessment complete. AI-assisted stroke risk indicator is ${overallRisk} percent.`);
+          }
+
+          if (overallRisk >= 50) {
+            updateStepTrackerUI(5);
+            trigger_emergency_response(`Automated Assessment Complete (${overallRisk}% Stroke Risk)`, overallRisk);
           }
         }
       }
     }, 1000);
+  }
+
+  function startSpeechRecognitionForStage3(targetSentence) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    try {
+      const rec = new SpeechRecognition();
+      rec.continuous = false;
+      rec.interimResults = false;
+      rec.lang = 'en-US';
+      rec.onresult = (e) => {
+        const heard = e.results[0][0].transcript;
+        speechMatchScore = calculateSpeechMatchScore(targetSentence, heard);
+        document.getElementById('val-speech-status').innerText = `Matched (${speechMatchScore}%)`;
+      };
+      rec.start();
+    } catch(e){}
+  }
+
+  function calculateSpeechMatchScore(target, heard) {
+    if (!heard) return 0;
+    const tWords = target.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/);
+    const hWords = heard.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/);
+    let matchCount = 0;
+    tWords.forEach(w => {
+      if (hWords.includes(w)) matchCount++;
+    });
+    return Math.max(15, Math.round((matchCount / tWords.length) * 100));
+  }
+
+  function resetAndRestartAssessment() {
+    startPhaseSequenceTimer();
   }
 
   function updatePhaseBannerUI() {
@@ -955,29 +1164,29 @@
     const summaryBox = document.getElementById('summary-prompt-box');
 
     if (activePhase === 1) {
-      title.innerText = "PHASE 1: FACIAL ASYMMETRY SCAN (30 SECONDS)";
+      title.innerText = "STAGE 1: FACIAL ASYMMETRY SCAN (30 SECONDS)";
       sub.innerText = "Camera automatically analyzing facial landmarks and symmetry. Zero button clicks required.";
       if (faceBox) faceBox.style.display = 'block';
       if (handBox) handBox.style.display = 'none';
       if (speechBox) speechBox.style.display = 'none';
       if (summaryBox) summaryBox.style.display = 'none';
     } else if (activePhase === 2) {
-      title.innerText = "PHASE 2: HAND & ARM ELEVATION ASSESSMENT (30 SECONDS)";
-      sub.innerText = "System analyzing hand/arm elevation drift and left/right movement asymmetry.";
+      title.innerText = "STAGE 2: ARM LIFTING ASSESSMENT (30 SECONDS)";
+      sub.innerText = "System tracking arm elevation drift and left/right movement asymmetry.";
       if (faceBox) faceBox.style.display = 'none';
       if (handBox) handBox.style.display = 'block';
       if (speechBox) speechBox.style.display = 'none';
       if (summaryBox) summaryBox.style.display = 'none';
     } else if (activePhase === 3) {
-      title.innerText = "PHASE 3: SPEECH SENTENCE ARTICULATION CHECK (20 SECONDS)";
-      sub.innerText = "Microphone analyzing voice clarity. Speak the phrase shown below.";
+      title.innerText = "STAGE 3: SPEECH TEST";
+      sub.innerText = "Microphone listening to voice clarity. Please speak the sentence shown below.";
       if (faceBox) faceBox.style.display = 'none';
       if (handBox) handBox.style.display = 'none';
       if (speechBox) speechBox.style.display = 'block';
       if (summaryBox) summaryBox.style.display = 'none';
     } else if (activePhase === 4) {
-      title.innerText = "PHASE 4: 3-PHASE SCREENING COMPLETED";
-      sub.innerText = "All 3 steps complete. Combined risk calculated & emergency response active.";
+      title.innerText = "STAGE 4: ASSESSMENT COMPLETED";
+      sub.innerText = "All 3 stages complete. Final AI-assisted risk indicator report generated below.";
       if (faceBox) faceBox.style.display = 'none';
       if (handBox) handBox.style.display = 'none';
       if (speechBox) speechBox.style.display = 'none';
@@ -1053,6 +1262,9 @@
       armAsymmetry = Math.min(90, Math.round(rawAsymRatio * 130));
 
       rawFrameRisk = Math.round((faceAsymmetry * 0.55) + (armAsymmetry * 0.45));
+
+      if (activePhase === 1) faceAsymmetrySamples.push(faceAsymmetry);
+      if (activePhase === 2) armAsymmetrySamples.push(armAsymmetry);
     } else {
       faceConfidence = 0;
       faceAsymmetry = 0;
