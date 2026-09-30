@@ -202,6 +202,17 @@ const handleChatRequest = async (req, res) => {
 app.post('/api/chat', handleChatRequest);
 app.post('/api/ai/chat', handleChatRequest);
 
+// Evaluation Benchmark Route
+app.get('/api/evaluation', (req, res) => {
+  try {
+    const runEvaluation = require('../evaluation/evaluate');
+    const metrics = runEvaluation();
+    res.json(metrics || { error: 'Failed to run evaluation' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 /* ==========================================================================
    MEDICAL DOCUMENTS VAULT API
    ========================================================================== */
