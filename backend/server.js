@@ -155,34 +155,52 @@ app.post('/api/checks', async (req, res) => {
    AI CHATBOT & CLINICAL TRIAGE API
    ========================================================================== */
 
-app.post('/api/ai/chat', async (req, res) => {
+const handleChatRequest = async (req, res) => {
   try {
-    const { message, currentScanResult } = req.body;
-    const aiResult = await aiService.processChat({ patientId: 1, message, currentScanResult });
+    const { message, history, patientId, currentScanResult } = req.body;
+    if (!message || typeof message !== 'string' || message.trim() === '') {
+      return res.status(400).json({ error: 'Message content is required.' });
+    }
 
-    // If AI detects critical urgency, trigger emergency response
+    const aiResult = await aiService.processChat({
+      patientId: patientId || 1,
+      message: message.trim(),
+      history: history || [],
+      currentScanResult
+    });
+
+    // If AI detects critical urgency or high risk, trigger emergency response
     let emergencyPayload = null;
-    if (aiResult.requiresEmergencyDispatch) {
+    if (aiResult.requiresEmergencyDispatch || aiResult.riskLevel === 'high' || aiResult.urgency === 'CRITICAL') {
       emergencyPayload = await emergencyService.triggerEmergencyResponse({
-        patientId: 1,
-        strokeScore: aiResult.strokeProbability,
+        patientId: patientId || 1,
+        strokeScore: aiResult.strokeProbability || 88,
         latitude: 28.5672,
         longitude: 77.2100,
-        customReason: `AI Chatbot Triaging Identified Acute Stroke Risk (${aiResult.strokeProbability}%)`
+        customReason: `AI Chatbot Triaging Identified Acute Stroke Risk (${aiResult.strokeProbability || 88}%)`
       }, wss);
     }
 
     res.json({
       reply: aiResult.reply,
       urgency: aiResult.urgency,
+      riskLevel: aiResult.riskLevel,
       strokeProbability: aiResult.strokeProbability,
-      emergencyTriggered: aiResult.requiresEmergencyDispatch,
-      emergencyPayload
+      emergencyTriggered: !!aiResult.requiresEmergencyDispatch,
+      emergencyPayload,
+      patientSummary: aiResult.patientSummary
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('[Server /api/chat Error]:', error.message);
+    res.status(500).json({
+      error: 'Failed to process chat request',
+      reply: "I encountered an error processing your request. If you are experiencing medical symptoms like face drooping or arm weakness, please call 108/112 immediately."
+    });
   }
-});
+};
+
+app.post('/api/chat', handleChatRequest);
+app.post('/api/ai/chat', handleChatRequest);
 
 /* ==========================================================================
    MEDICAL DOCUMENTS VAULT API

@@ -1,68 +1,183 @@
 /**
  * backend/aiService.js
  * AI Chatbot, Symptom Triaging & Document Intelligence Engine for NeuroWatch AI
+ * Powered by Google Gemini API (@google/genai) & SQLite Patient Medical Context
  */
 
+require('dotenv').config();
+const { GoogleGenAI } = require('@google/genai');
 const db = require('./db');
 
 class AIService {
+  constructor() {
+    this.initClient();
+  }
+
+  initClient() {
+    this.apiKey = process.env.GEMINI_API_KEY || '';
+    if (this.apiKey && !this.apiKey.includes('your_gemini_api_key_here')) {
+      try {
+        this.ai = new GoogleGenAI({ apiKey: this.apiKey });
+      } catch (e) {
+        console.warn('[AIService] Failed to initialize GoogleGenAI client:', e.message);
+      }
+    } else {
+      this.ai = null;
+    }
+  }
+
   /**
-   * Process patient chat message with medical context
+   * Helper to fetch patient data from SQLite
    */
-  async processChat({ patientId = 1, message, currentScanResult = null }) {
+  getPatientData(patientId) {
     return new Promise((resolve) => {
-      db.get('SELECT * FROM patients WHERE id = ?', [patientId], (err, patient) => {
-        if (!patient) {
-          patient = {
-            name: 'Patient',
-            age: 58,
-            medical_history: 'Hypertension, Diabetes',
-            medications: 'Aspirin, Amlodipine'
-          };
-        }
-
-        const msgLower = (message || '').toLowerCase();
-        let urgency = 'LOW';
-        let strokeProbability = 15;
-        let requiresEmergencyDispatch = false;
-        let reply = '';
-
-        // FAST Keyword evaluation
-        const strokeKeywords = ['numbness', 'weakness', 'slurred', 'face drooping', 'arm drift', 'vision loss', 'headache', 'dizziness', 'paralysis', 'fast'];
-        const matchedKeywords = strokeKeywords.filter(kw => msgLower.includes(kw));
-
-        if (matchedKeywords.length >= 2 || msgLower.includes('severe headache') || msgLower.includes('cannot speak') || (currentScanResult && currentScanResult.faceAsymmetry)) {
-          urgency = 'CRITICAL';
-          strokeProbability = 88;
-          requiresEmergencyDispatch = true;
-          reply = `🚨 **CRITICAL RISK DETECTED (88%)**\nBased on your reported symptoms ("${matchedKeywords.join(', ')}") and past medical history (${patient.medical_history}), an **88% risk level** has been identified requiring immediate emergency assistance.\n\n⚡ **Actions initiated immediately:**\n1. Calling Indian Emergency Ambulance (108).\n2. Alerting your saved emergency contacts (Loved Ones) with continuous alarming.\n3. Alerting nearby hospitals & emergency desks.\n\n**First-Aid Instructions:** Keep calm, sit or lie down with head slightly elevated (30 degrees). Do NOT take food, water, or aspirin until evaluated by emergency doctors. Note the exact time symptoms started. Remember: "Time is brain".`;
-        } else if (matchedKeywords.length === 1 || msgLower.includes('dizzy') || msgLower.includes('headache')) {
-          urgency = 'MODERATE';
-          strokeProbability = 45;
-          reply = `⚠️ **Moderate Neurological Risk Identified (45%)**\nYou mentioned "${matchedKeywords.join(', ')}". Given your medical profile (${patient.medical_history}), we recommend completing an instant BE-FAST camera screen or consulting a medical expert immediately.\n\nIf symptoms worsen or face drooping/arm weakness develops, tap the **Green Emergency Help** button immediately.`;
-        } else if (msgLower.includes('history') || msgLower.includes('record') || msgLower.includes('document')) {
-          urgency = 'LOW';
-          strokeProbability = 10;
-          reply = `📋 **Medical Profile & History Summary for ${patient.name}:**\n- **Age**: ${patient.age}\n- **Blood Group**: ${patient.blood_group || 'B+'}\n- **Known Conditions**: ${patient.medical_history}\n- **Current Medications**: ${patient.medications}\n- **Allergies**: ${patient.allergies || 'None'}\n\nAll your uploaded MRI, CT scan, and ECG documents are securely stored and instantly accessible by emergency hospitals during an SOS event. Remember: "Time is brain".`;
+      db.get('SELECT * FROM patients WHERE id = ?', [patientId || 1], (err, row) => {
+        if (err || !row) {
+          db.get('SELECT * FROM patients ORDER BY id ASC LIMIT 1', (err2, fallbackRow) => {
+            resolve(fallbackRow || {
+              name: 'Rajesh Sharma',
+              age: 58,
+              medical_history: 'Hypertension, Type 2 Diabetes, High Cholesterol',
+              medications: 'Aspirin 75mg, Amlodipine 5mg, Metformin 500mg',
+              allergies: 'Penicillin'
+            });
+          });
         } else {
-          urgency = 'LOW';
-          strokeProbability = 12;
-          reply = `Hello ${patient.name}. I am your NeuroWatch AI Health Assistant. Motto: "Time is brain". I continuously monitor your BE-FAST risk indicators alongside your past medical history.\n\nHow can I help you today? You can report symptoms, ask about your saved medical records, or request a FAST bystander scan.`;
+          resolve(row);
         }
-
-        resolve({
-          reply,
-          urgency,
-          strokeProbability,
-          requiresEmergencyDispatch,
-          patientSummary: {
-            name: patient.name,
-            age: patient.age,
-            history: patient.medical_history
-          }
-        });
       });
     });
+  }
+
+  /**
+   * Process patient chat message with medical context & Gemini LLM
+   */
+  async processChat({ patientId = 1, message, history = [], currentScanResult = null }) {
+    // Re-check API key in case env changed
+    this.initClient();
+
+    const patient = await this.getPatientData(patientId);
+    const msgText = (message || '').trim();
+    const msgLower = msgText.toLowerCase();
+
+    // BE-FAST Critical Keyword Evaluation
+    const strokeKeywords = [
+      'face drooping', 'facial drooping', 'arm weakness', 'arm drift', 'hand weakness',
+      'speech difficulty', 'slurred speech', 'cannot speak', 'trouble speaking',
+      'sudden vision loss', 'double vision', 'blindness in one eye',
+      'loss of balance', 'unsteady walking', 'dizziness', 'severe sudden headache',
+      'numbness on one side', 'paralysis', 'hemiparesis'
+    ];
+    const detectedStrokeSigns = strokeKeywords.filter(kw => msgLower.includes(kw));
+    const isCriticalKeywordMatch = detectedStrokeSigns.length > 0 || 
+      (msgLower.includes('stroke') && (msgLower.includes('having') || msgLower.includes('symptom') || msgLower.includes('help'))) || 
+      (currentScanResult && currentScanResult.smoothedRisk >= 75);
+
+    // Build Medical System Prompt
+    const systemPrompt = `You are NeuroWatch AI, an expert medical triage assistant specializing in stroke awareness and BE-FAST signs (Balance, Eyes, Face, Arm, Speech, Time).
+Your motto is "Time is brain".
+
+PATIENT MEDICAL BACKGROUND (FROM NEUROWATCH DATABASE):
+- Patient Name: ${patient.name}
+- Age: ${patient.age}
+- Known Medical Conditions: ${patient.medical_history || 'Hypertension, Diabetes'}
+- Current Medications: ${patient.medications || 'Aspirin, Amlodipine'}
+- Allergies: ${patient.allergies || 'None'}
+
+INSTRUCTIONS & GUIDELINES:
+1. Answer any medical or health question in simple, clear, empathetic language.
+2. IF THE USER DESCRIBES ACUTE STROKE SYMPTOMS (e.g. face drooping, arm weakness, speech difficulty, sudden vision loss, loss of balance, severe sudden headache):
+   - You MUST respond FIRST with: "Call 108/112 immediately" in bold at the very top of your response.
+   - Emphasize that acute neurological onset is a medical emergency where "Time is brain".
+3. ALWAYS include a brief medical disclaimer note at the end: "(Note: This AI screening assistant is for informational/triage purposes and is not a substitute for professional doctor evaluation or hospital diagnosis.)"
+4. Keep responses concise, structured, and easy to read. Use bullet points where helpful.`;
+
+    let replyText = '';
+    let urgency = 'LOW';
+    let strokeProbability = 12;
+    let requiresEmergencyDispatch = false;
+    let riskLevel = 'low';
+    let apiSuccess = false;
+
+    // Attempt Gemini API Generation if key is configured
+    if (this.apiKey && !this.apiKey.includes('your_gemini_api_key_here') && this.ai) {
+      try {
+        const contents = [];
+
+        // Add history turns if available
+        if (Array.isArray(history)) {
+          history.forEach(item => {
+            const role = (item.role === 'user' || item.sender === 'user') ? 'user' : 'model';
+            const text = item.content || item.message || '';
+            if (text.trim()) {
+              contents.push({ role, parts: [{ text }] });
+            }
+          });
+        }
+        contents.push({ role: 'user', parts: [{ text: msgText }] });
+
+        // Call Gemini 2.5 Flash / Gemini Model
+        const response = await this.ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: contents,
+          config: {
+            systemInstruction: systemPrompt,
+            temperature: 0.3
+          }
+        });
+
+        if (response && response.text) {
+          replyText = response.text.trim();
+          apiSuccess = true;
+        }
+      } catch (err) {
+        console.error('[AIService Error] Gemini API generation failed:', err.message);
+      }
+    } else {
+      console.warn('[AIService Warning] GEMINI_API_KEY is not configured in .env. Using structured clinical fallback.');
+    }
+
+    // Evaluate Risk Level & Fallback if API was unavailable or skipped
+    if (isCriticalKeywordMatch) {
+      urgency = 'CRITICAL';
+      riskLevel = 'high';
+      strokeProbability = 88;
+      requiresEmergencyDispatch = true;
+
+      if (!apiSuccess) {
+        replyText = `🚨 **Call 108/112 immediately**\n\nBased on your reported signs ("${detectedStrokeSigns.join(', ') || 'acute stroke symptoms'}") and medical background (${patient.medical_history}), an immediate emergency response is required.\n\n**First-Aid Instructions:**\n- Sit or lie down safely with head elevated 30 degrees.\n- Do NOT eat, drink, or take oral medication.\n- Note the exact time symptoms started. Remember: "Time is brain".\n\n*(Note: This AI screening assistant is for triage purposes and is not a substitute for professional doctor evaluation.)*`;
+      } else if (!replyText.toLowerCase().includes('108') && !replyText.toLowerCase().includes('112')) {
+        replyText = `🚨 **Call 108/112 immediately**\n\n` + replyText;
+      }
+    } else if (msgLower.includes('headache') || msgLower.includes('dizzy') || msgLower.includes('numb')) {
+      urgency = 'MODERATE';
+      riskLevel = 'moderate';
+      strokeProbability = 45;
+      if (!apiSuccess) {
+        replyText = `⚠️ **Moderate Neurological Symptom Warning (${patient.name}):**\nYou mentioned neurological symptoms. Given your medical profile (${patient.medical_history}), we recommend completing our instant 3-stage camera assessment or seeking doctor evaluation.\n\n*(Note: This AI assistant is for awareness purposes and is not a substitute for a doctor.)*`;
+      }
+    } else {
+      urgency = 'LOW';
+      riskLevel = 'low';
+      strokeProbability = 12;
+      if (!apiSuccess) {
+        replyText = `Hello ${patient.name}. I am your NeuroWatch AI Medical Assistant (Motto: "Time is brain").\n\nI can answer questions regarding stroke prevention, BE-FAST symptoms, or your saved medical history (${patient.medical_history}). How can I assist you today?\n\n*(Note: This AI assistant is for educational purposes and is not a substitute for a doctor.)*`;
+      }
+    }
+
+    return {
+      reply: replyText,
+      urgency,
+      riskLevel,
+      strokeProbability,
+      requiresEmergencyDispatch,
+      apiSuccess,
+      patientSummary: {
+        name: patient.name,
+        age: patient.age,
+        history: patient.medical_history
+      }
+    };
   }
 
   /**

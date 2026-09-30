@@ -1513,30 +1513,93 @@
     document.getElementById('sos-modal').style.display = 'none';
   }
 
+  let chatHistory = [];
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.innerText = text;
+    return div.innerHTML;
+  }
+
+  function formatMarkdown(text) {
+    if (!text) return '';
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+  }
+
   function sendChatMessage() {
     const input = document.getElementById('chat-input');
     const msg = input.value.trim();
     if (!msg) return;
 
     const chatMessages = document.getElementById('chat-messages');
-    chatMessages.innerHTML += `<div class="msg user">${msg}</div>`;
+    chatMessages.innerHTML += `<div class="msg user">${escapeHtml(msg)}</div>`;
     input.value = '';
+
+    // Add loading indicator
+    const loadingId = 'loading-' + Date.now();
+    chatMessages.innerHTML += `
+      <div class="msg bot loading" id="${loadingId}" style="opacity: 0.8; font-style: italic;">
+        ⏳ NeuroWatch AI is analyzing...
+      </div>
+    `;
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
-    fetch('/api/ai/chat', {
+    // Append to local history for multi-turn conversations
+    chatHistory.push({ role: 'user', content: msg });
+
+    fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg })
+      body: JSON.stringify({
+        message: msg,
+        history: chatHistory,
+        patientId: 1
+      })
     })
-    .then(r => r.json())
+    .then(async r => {
+      if (!r.ok) {
+        const errData = await r.json().catch(() => ({}));
+        throw new Error(errData.error || errData.reply || `HTTP ${r.status} Error`);
+      }
+      return r.json();
+    })
     .then(data => {
-      const msgClass = data.urgency === 'CRITICAL' ? 'msg bot critical' : 'msg bot';
-      chatMessages.innerHTML += `<div class="${msgClass}">${data.reply.replace(/\n/g, '<br>')}</div>`;
+      const loadingEl = document.getElementById(loadingId);
+      if (loadingEl) loadingEl.remove();
+
+      const replyMsg = data.reply || 'No response returned.';
+      chatHistory.push({ role: 'model', content: replyMsg });
+
+      const isCritical = data.urgency === 'CRITICAL' || data.riskLevel === 'high' || data.emergencyTriggered;
+      const msgClass = isCritical ? 'msg bot critical' : 'msg bot';
+
+      chatMessages.innerHTML += `<div class="${msgClass}">${formatMarkdown(replyMsg)}</div>`;
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
       if (data.emergencyTriggered) {
-        trigger_emergency_response('AI Chatbot Triaging Identified Risk', 92);
+        trigger_emergency_response('AI Chatbot Triaging Identified Acute Risk', data.strokeProbability || 88);
       }
+    })
+    .catch(err => {
+      const loadingEl = document.getElementById(loadingId);
+      if (loadingEl) loadingEl.remove();
+
+      console.error('[Frontend Chat Error]:', err);
+      chatMessages.innerHTML += `
+        <div class="msg bot" style="background: rgba(239, 68, 68, 0.15); border: 1px solid var(--crimson-danger); color: #fff;">
+          ⚠️ <strong>Unable to connect to AI server:</strong> ${escapeHtml(err.message || 'Network error')}
+          <br><br>
+          <span style="font-size: 11px; color: var(--amber-warn);">If you are experiencing medical symptoms like face drooping, arm weakness, or speech difficulty, please call 108/112 immediately.</span>
+        </div>
+      `;
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     });
   }
 

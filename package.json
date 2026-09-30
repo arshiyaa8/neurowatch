@@ -9,10 +9,12 @@
     "dev": "node backend/server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
+    "@google/genai": "^2.24.0",
     "cors": "^2.8.5",
-    "sqlite3": "^5.1.7",
+    "dotenv": "^18.0.4",
+    "express": "^4.19.2",
     "multer": "^1.4.5-lts.1",
+    "sqlite3": "^5.1.7",
     "ws": "^8.17.0"
   },
   "keywords": [
