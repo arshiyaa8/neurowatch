@@ -567,6 +567,177 @@
           </div>
         </div>
 
+        <!-- Questionnaire Header & Fields -->
+        <div style="border-top: 1px solid var(--panel-border); padding-top: 16px; margin-top: 8px;">
+          <h4 style="font-family: var(--font-mono); color: var(--cyan-accent); font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+            🩺 STROKE RISK-FACTOR QUESTIONNAIRE (Screening & Awareness Self-Report)
+          </h4>
+          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">
+            Your responses are summarized qualitatively on your final assessment report (no arbitrary point scoring).
+          </p>
+
+          <!-- Row 1: Blood Pressure & Optional Readings -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                BLOOD PRESSURE STATUS
+              </label>
+              <select id="user-input-bp" class="input-field" style="margin-bottom: 0;">
+                <option value="Normal">Normal (&lt;120/80 mmHg)</option>
+                <option value="Hypertension">Hypertension / High BP</option>
+                <option value="Don't know">Don't know</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                SYSTOLIC (OPTIONAL mmHg)
+              </label>
+              <input type="number" id="user-input-systolic" class="input-field" placeholder="e.g. 130" style="margin-bottom: 0;">
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                DIASTOLIC (OPTIONAL mmHg)
+              </label>
+              <input type="number" id="user-input-diastolic" class="input-field" placeholder="e.g. 85" style="margin-bottom: 0;">
+            </div>
+          </div>
+
+          <!-- Row 2: Cholesterol & Optional Readings -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                CHOLESTEROL STATUS
+              </label>
+              <select id="user-input-cholesterol" class="input-field" style="margin-bottom: 0;">
+                <option value="Normal">Normal</option>
+                <option value="High Cholesterol">High Cholesterol</option>
+                <option value="Don't know">Don't know</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                LDL (OPTIONAL mg/dL)
+              </label>
+              <input type="number" id="user-input-ldl" class="input-field" placeholder="e.g. 130" style="margin-bottom: 0;">
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                HDL (OPTIONAL mg/dL)
+              </label>
+              <input type="number" id="user-input-hdl" class="input-field" placeholder="e.g. 50" style="margin-bottom: 0;">
+            </div>
+          </div>
+
+          <!-- Row 3: Diabetes, Heart Condition, Prev Stroke -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                DIABETES (TYPE 1 / 2)
+              </label>
+              <select id="user-input-diabetes" class="input-field" style="margin-bottom: 0;">
+                <option value="No">No</option>
+                <option value="Yes (Diabetes)">Yes</option>
+                <option value="Don't know">Don't know</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                HEART CONDITION / AFIB
+              </label>
+              <select id="user-input-afib" class="input-field" style="margin-bottom: 0;">
+                <option value="No">No</option>
+                <option value="Yes (AFib / Arrhythmia)">Yes (AFib / Heart Condition)</option>
+                <option value="Don't know">Don't know</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                PREVIOUS STROKE / TIA
+              </label>
+              <select id="user-input-prev-stroke" class="input-field" style="margin-bottom: 0;">
+                <option value="No">No</option>
+                <option value="Yes (Prior Stroke/TIA)">Yes</option>
+                <option value="Don't know">Don't know</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 4: Lifestyle Factors -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                SMOKING STATUS
+              </label>
+              <select id="user-input-smoking" class="input-field" style="margin-bottom: 0;">
+                <option value="Never">Never</option>
+                <option value="Former Smoker">Former Smoker</option>
+                <option value="Current Smoker">Current Smoker</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                PHYSICAL ACTIVITY
+              </label>
+              <select id="user-input-activity" class="input-field" style="margin-bottom: 0;">
+                <option value="Regular Exercise">Regular Exercise</option>
+                <option value="Sometimes">Sometimes / Light</option>
+                <option value="Sedentary">Sedentary</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                ALCOHOL INTAKE
+              </label>
+              <select id="user-input-alcohol" class="input-field" style="margin-bottom: 0;">
+                <option value="None">None / Rare</option>
+                <option value="Occasional">Occasional</option>
+                <option value="Frequent">Frequent / Heavy</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 5: Body Metrics (BMI) & Family History -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px;">
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                HEIGHT (cm)
+              </label>
+              <input type="number" id="user-input-height" class="input-field" placeholder="e.g. 170" style="margin-bottom: 0;">
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                WEIGHT (kg)
+              </label>
+              <input type="number" id="user-input-weight" class="input-field" placeholder="e.g. 70" style="margin-bottom: 0;">
+            </div>
+            <div>
+              <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+                FAMILY HISTORY OF STROKE
+              </label>
+              <select id="user-input-family-history" class="input-field" style="margin-bottom: 0;">
+                <option value="No">No</option>
+                <option value="Yes (Parents/Siblings)">Yes (Parents / Siblings)</option>
+                <option value="Don't know">Don't know</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Row 6: B.E. FAST Balance & Vision Self-Report -->
+          <div style="margin-bottom: 14px;">
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-muted); font-family: var(--font-mono); display: block; margin-bottom: 4px;">
+              B.E. FAST SELF-REPORT (Sudden Loss of Balance or Sudden Vision Loss/Blurriness)
+            </label>
+            <select id="user-input-balance-vision" class="input-field" style="margin-bottom: 0;">
+              <option value="No recent issues">No recent balance or vision issues</option>
+              <option value="Yes — Sudden Loss of Balance">Yes — Sudden Loss of Balance (B in BE-FAST)</option>
+              <option value="Yes — Sudden Vision Loss / Double Vision">Yes — Sudden Vision Loss / Double Vision (E in BE-FAST)</option>
+              <option value="Yes — Both Balance & Vision Issues">Yes — Both Balance & Vision Issues</option>
+            </select>
+          </div>
+        </div>
+
         <div id="user-intake-error" style="display: none; color: var(--crimson-danger); font-size: 13px; font-family: var(--font-mono); font-weight: 700;"></div>
 
         <button type="submit" class="btn btn-green" style="padding: 14px; font-size: 15px; justify-content: center; margin-top: 6px;">
@@ -668,6 +839,16 @@
           <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700;">SPEECH TEST</div>
           <div style="font-size: 32px; font-weight: 800; color: var(--cyan-accent); margin: 6px 0;" id="res-speech-val">72% match</div>
           <div style="font-size: 11px; color: var(--emerald-ok);" id="res-speech-status">Stage 3 Completed</div>
+        </div>
+      </div>
+
+      <!-- Questionnaire Risk-Factor Summary Section -->
+      <div style="background: rgba(8,14,24,0.85); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); margin-bottom: 24px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--cyan-accent); font-family: var(--font-mono); margin-bottom: 12px;">
+          📋 STROKE RISK-FACTOR SUMMARY (Qualitative Self-Report Summary)
+        </div>
+        <div id="res-risk-factors-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; font-size: 12px; color: var(--text-main);">
+          <!-- Populated dynamically -->
         </div>
       </div>
 
@@ -1086,15 +1267,63 @@
 
     errDiv.style.display = 'none';
 
+    // Collect Risk Factor Questionnaire responses
+    const bpStatus = document.getElementById('user-input-bp')?.value || 'Normal';
+    const systolic = document.getElementById('user-input-systolic')?.value.trim() || '';
+    const diastolic = document.getElementById('user-input-diastolic')?.value.trim() || '';
+    const cholesterolStatus = document.getElementById('user-input-cholesterol')?.value || 'Normal';
+    const ldl = document.getElementById('user-input-ldl')?.value.trim() || '';
+    const hdl = document.getElementById('user-input-hdl')?.value.trim() || '';
+    const diabetes = document.getElementById('user-input-diabetes')?.value || 'No';
+    const heartAfib = document.getElementById('user-input-afib')?.value || 'No';
+    const prevStroke = document.getElementById('user-input-prev-stroke')?.value || 'No';
+    const smoking = document.getElementById('user-input-smoking')?.value || 'Never';
+    const activity = document.getElementById('user-input-activity')?.value || 'Regular Exercise';
+    const alcohol = document.getElementById('user-input-alcohol')?.value || 'None';
+    const heightCm = document.getElementById('user-input-height')?.value.trim() || '';
+    const weightKg = document.getElementById('user-input-weight')?.value.trim() || '';
+    const familyHistory = document.getElementById('user-input-family-history')?.value || 'No';
+    const balanceVision = document.getElementById('user-input-balance-vision')?.value || 'No recent issues';
+
+    let bmi = null;
+    const h = parseFloat(heightCm);
+    const w = parseFloat(weightKg);
+    if (h > 0 && w > 0) {
+      const hm = h / 100;
+      bmi = Number((w / (hm * hm)).toFixed(1));
+    }
+
+    const riskFactors = {
+      bpStatus, systolic, diastolic,
+      cholesterolStatus, ldl, hdl,
+      diabetes, heartAfib, prevStroke,
+      smoking, activity, alcohol,
+      heightCm, weightKg, bmi,
+      familyHistory, balanceVision
+    };
+
     activeUserSession = {
       name: nameInput,
       age: ageInput,
       gender: genderInput,
       contactName: contactNameInput,
-      contactPhone: contactPhoneInput
+      contactPhone: contactPhoneInput,
+      riskFactors
     };
 
     sessionStorage.setItem('neurowatch_user', JSON.stringify(activeUserSession));
+
+    // Construct medical history summary text for backend SQLite
+    const medHistoryList = [];
+    if (bpStatus === 'Hypertension') medHistoryList.push(`Hypertension${systolic ? ` (${systolic}/${diastolic} mmHg)` : ''}`);
+    if (cholesterolStatus === 'High Cholesterol') medHistoryList.push('High Cholesterol');
+    if (diabetes.includes('Yes')) medHistoryList.push('Diabetes');
+    if (heartAfib.includes('Yes')) medHistoryList.push('AFib / Heart Condition');
+    if (prevStroke.includes('Yes')) medHistoryList.push('Prior Stroke/TIA');
+    if (familyHistory.includes('Yes')) medHistoryList.push('Family History of Stroke');
+    if (balanceVision.includes('Yes')) medHistoryList.push(`Self-reported: ${balanceVision}`);
+
+    const medicalHistoryStr = medHistoryList.join(', ') || 'No reported major risk factors';
 
     // Save to backend SQLite database
     fetch('/api/patient', {
@@ -1105,8 +1334,8 @@
         age: ageInput,
         phone: contactPhoneInput || '+91 9876543210',
         blood_group: 'B+',
-        medical_history: 'Hypertension, Diabetes',
-        medications: 'Aspirin, Amlodipine',
+        medical_history: medicalHistoryStr,
+        medications: 'None reported',
         allergies: 'None'
       })
     }).catch(err => console.warn('Backend sync warning:', err));
@@ -1257,6 +1486,49 @@
           document.getElementById('res-arm-val').innerText = `${finalArmScore}%`;
           document.getElementById('res-speech-val').innerText = `${speechMatchScore}% match`;
           document.getElementById('res-overall-score-val').innerText = `${overallRisk}%`;
+
+          // Render Risk Factor Questionnaire Summary section
+          const rf = activeUserSession.riskFactors || {};
+          const rfSummaryContainer = document.getElementById('res-risk-factors-summary');
+          if (rfSummaryContainer) {
+            let bmiCategory = '';
+            if (rf.bmi) {
+              if (rf.bmi < 18.5) bmiCategory = ' (Underweight)';
+              else if (rf.bmi < 25) bmiCategory = ' (Normal weight)';
+              else if (rf.bmi < 30) bmiCategory = ' (Overweight)';
+              else bmiCategory = ' (Obese)';
+            }
+
+            rfSummaryContainer.innerHTML = `
+              <div style="background: rgba(14,21,35,0.7); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                <strong style="color: var(--cyan-accent);">Blood Pressure:</strong> ${rf.bpStatus || 'Normal'}${rf.systolic ? ` (${rf.systolic}/${rf.diastolic} mmHg)` : ''}
+              </div>
+              <div style="background: rgba(14,21,35,0.7); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                <strong style="color: var(--cyan-accent);">Cholesterol:</strong> ${rf.cholesterolStatus || 'Normal'}${rf.ldl ? ` (LDL:${rf.ldl}/HDL:${rf.hdl})` : ''}
+              </div>
+              <div style="background: rgba(14,21,35,0.7); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                <strong style="color: var(--cyan-accent);">Diabetes:</strong> ${rf.diabetes || 'No'}
+              </div>
+              <div style="background: rgba(14,21,35,0.7); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                <strong style="color: var(--cyan-accent);">Heart / AFib:</strong> ${rf.heartAfib || 'No'}
+              </div>
+              <div style="background: rgba(14,21,35,0.7); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                <strong style="color: var(--cyan-accent);">Prior Stroke/TIA:</strong> ${rf.prevStroke || 'No'}
+              </div>
+              <div style="background: rgba(14,21,35,0.7); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                <strong style="color: var(--cyan-accent);">Smoking & Activity:</strong> ${rf.smoking || 'Never'} | ${rf.activity || 'Regular Exercise'}
+              </div>
+              <div style="background: rgba(14,21,35,0.7); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                <strong style="color: var(--cyan-accent);">BMI & Body Weight:</strong> ${rf.bmi ? `${rf.bmi} kg/m²${bmiCategory}` : 'Not provided'}
+              </div>
+              <div style="background: rgba(14,21,35,0.7); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--panel-border);">
+                <strong style="color: var(--cyan-accent);">Family History:</strong> ${rf.familyHistory || 'No'}
+              </div>
+              <div style="background: rgba(14,21,35,0.7); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--panel-border); grid-column: 1 / -1;">
+                <strong style="color: var(--amber-warn);">B.E. FAST Self-Report:</strong> ${rf.balanceVision || 'No recent issues'}
+              </div>
+            `;
+          }
 
           const label = document.getElementById('res-overall-category-label');
           if (overallRisk < 50) {

@@ -45,6 +45,7 @@ def evaluate():
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
     f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+    fpr = fp / (fp + tn) if (fp + tn) > 0 else 0.0
 
     print("=" * 65)
     print("      NEUROWATCH AI — EVALUATION BENCHMARK METRICS SUMMARY")
@@ -61,6 +62,7 @@ def evaluate():
     print(f"Precision : {precision:.4f} ({precision * 100:.2f}%)")
     print(f"Recall    : {recall:.4f} ({recall * 100:.2f}%)")
     print(f"F1-Score  : {f1:.4f}")
+    print(f"False Positive Rate (FPR): {fpr:.4f} ({fpr * 100:.2f}%)")
     print("=" * 65)
     print("Disclaimer: Evaluated on controlled, simulated screening test cases.")
     print("NeuroWatch AI is a screening awareness prototype, not clinically validated.")

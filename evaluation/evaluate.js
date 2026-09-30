@@ -35,6 +35,7 @@ function runEvaluation() {
   const precision = (tp + fp) > 0 ? tp / (tp + fp) : 0;
   const recall = (tp + fn) > 0 ? tp / (tp + fn) : 0;
   const f1 = (precision + recall) > 0 ? 2 * (precision * recall) / (precision + recall) : 0;
+  const fpr = (fp + tn) > 0 ? fp / (fp + tn) : 0;
 
   return {
     totalSamples: total,
@@ -46,6 +47,7 @@ function runEvaluation() {
     precision: Number(precision.toFixed(4)),
     recall: Number(recall.toFixed(4)),
     f1Score: Number(f1.toFixed(4)),
+    falsePositiveRate: Number(fpr.toFixed(4)),
     disclaimer: 'Evaluated on controlled simulated screening test cases. Not clinically validated.'
   };
 }
