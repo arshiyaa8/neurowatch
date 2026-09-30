@@ -805,9 +805,18 @@
     <!-- Stage 4 Dedicated Final Results Page Card -->
     <div id="results-page-card" class="card" style="display: none; border: 2px solid var(--cyan-accent); margin-bottom: 20px;">
       <div style="text-align: center; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px; margin-bottom: 18px;">
-        <h2 style="font-family: var(--font-mono); color: var(--cyan-accent); font-size: 24px; letter-spacing: 0.05em;">NEUROWATCH AI</h2>
-        <h3 style="font-family: var(--font-mono); color: #fff; font-size: 16px; margin-top: 4px;">ASSESSMENT COMPLETE</h3>
-        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px; font-style: italic;">AI-assisted screening result (Screening / awareness indicator — Not a medical diagnosis)</div>
+        <h2 style="font-family: var(--font-mono); color: var(--cyan-accent); font-size: 24px; letter-spacing: 0.05em;">NEUROWATCH WARNING INDICATOR SCORE</h2>
+        <h3 style="font-family: var(--font-mono); color: #fff; font-size: 15px; margin-top: 4px;">AUTOMATED ASSESSMENT BREAKDOWN</h3>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px; font-style: italic;">
+          Represents how strongly current test signals matched programmed warning indicators — Not a medical diagnosis or stroke probability.
+        </div>
+      </div>
+
+      <!-- B.E. FAST Symptom Override Emergency Banner (Appears if any sudden BE-FAST sign reported/detected) -->
+      <div id="befast-override-banner" style="display: none; background: rgba(239, 68, 68, 0.2); border: 2px solid var(--crimson-danger); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; text-align: center; animation: pulseAlert 1.2s infinite alternate;">
+        <div style="font-family: var(--font-mono); font-weight: 800; font-size: 18px; color: var(--crimson-danger);">🚨 EMERGENCY WARNING: POSSIBLE STROKE WARNING SIGN REPORTED</div>
+        <div style="font-size: 14px; color: #fff; margin-top: 4px; font-weight: 700;">Emergency warning: A sudden stroke warning sign has been reported. Seek emergency medical assistance immediately.</div>
+        <div style="font-size: 12px; color: var(--cyan-accent); margin-top: 8px; font-family: var(--font-mono);" id="befast-override-summary-line"></div>
       </div>
 
       <!-- Entered Patient Identifier Header -->
@@ -822,40 +831,60 @@
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <!-- Observable Assessment Signals Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px;">
         <div style="background: rgba(8,14,24,0.85); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); text-align: center;">
           <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700;">FACIAL ASYMMETRY</div>
-          <div style="font-size: 32px; font-weight: 800; color: var(--cyan-accent); margin: 6px 0;" id="res-face-val">27%</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--cyan-accent); margin: 6px 0;" id="res-face-val">0%</div>
           <div style="font-size: 11px; color: var(--emerald-ok);" id="res-face-status">Stage 1 Completed</div>
         </div>
 
         <div style="background: rgba(8,14,24,0.85); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); text-align: center;">
           <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700;">ARM ASYMMETRY</div>
-          <div style="font-size: 32px; font-weight: 800; color: var(--cyan-accent); margin: 6px 0;" id="res-arm-val">41%</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--cyan-accent); margin: 6px 0;" id="res-arm-val">0%</div>
           <div style="font-size: 11px; color: var(--emerald-ok);" id="res-arm-status">Stage 2 Completed</div>
         </div>
 
         <div style="background: rgba(8,14,24,0.85); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); text-align: center;">
-          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700;">SPEECH TEST</div>
-          <div style="font-size: 32px; font-weight: 800; color: var(--cyan-accent); margin: 6px 0;" id="res-speech-val">72% match</div>
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700;">SPEECH TEST MATCH</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--cyan-accent); margin: 6px 0;" id="res-speech-val">0% match</div>
           <div style="font-size: 11px; color: var(--emerald-ok);" id="res-speech-status">Stage 3 Completed</div>
         </div>
       </div>
 
-      <!-- Questionnaire Risk-Factor Summary Section -->
-      <div style="background: rgba(8,14,24,0.85); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); margin-bottom: 24px;">
+      <!-- B.E. FAST Reported & Detected Symptoms Checklist Card -->
+      <div style="background: rgba(8,14,24,0.85); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); margin-bottom: 20px;">
         <div style="font-size: 13px; font-weight: 700; color: var(--cyan-accent); font-family: var(--font-mono); margin-bottom: 12px;">
-          📋 STROKE RISK-FACTOR SUMMARY (Qualitative Self-Report Summary)
+          🏃 B.E. FAST REPORTED & OBSERVED SYMPTOMS CHECKLIST
+        </div>
+        <div id="res-befast-checklist-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-size: 12px;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Questionnaire Background Risk-Factor Summary Section -->
+      <div style="background: rgba(8,14,24,0.85); padding: 18px; border-radius: 12px; border: 1px solid var(--panel-border); margin-bottom: 20px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--cyan-accent); font-family: var(--font-mono); margin-bottom: 12px;">
+          📋 BACKGROUND STROKE RISK FACTORS (Qualitative Self-Report Summary — Not added to numerical score)
         </div>
         <div id="res-risk-factors-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; font-size: 12px; color: var(--text-main);">
           <!-- Populated dynamically -->
         </div>
       </div>
 
-      <div style="background: rgba(4,8,16,0.95); padding: 22px; border-radius: 14px; border: 2px solid var(--amber-warn); text-align: center; margin-bottom: 24px;" id="res-overall-card-box">
-        <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.1em;">OVERALL STROKE-RISK INDICATOR</div>
-        <div style="font-size: 46px; font-weight: 900; color: var(--amber-warn); font-family: var(--font-mono); margin: 8px 0;" id="res-overall-score-val">78%</div>
-        <div style="font-size: 14px; color: #fff; font-weight: 600;" id="res-overall-category-label">🚨 High Risk — Urgent Emergency Attention Recommended</div>
+      <!-- Overall Observable Warning Indicator Score Box & Prototype Range Interpretation -->
+      <div style="background: rgba(4,8,16,0.95); padding: 24px; border-radius: 14px; border: 2px solid var(--amber-warn); text-align: center; margin-bottom: 20px;" id="res-overall-card-box">
+        <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.1em;">OBSERVABLE WARNING INDICATOR SCORE</div>
+        <div style="font-size: 52px; font-weight: 900; color: var(--amber-warn); font-family: var(--font-mono); margin: 6px 0;" id="res-overall-score-val">0%</div>
+        <div style="font-size: 16px; color: #fff; font-weight: 800; font-family: var(--font-mono);" id="res-overall-category-label">Low warning indicators detected</div>
+        <div style="font-size: 13px; color: var(--text-main); margin-top: 8px; max-width: 680px; margin-left: auto; margin-right: auto; line-height: 1.5;" id="res-overall-guidance-text">
+          No significant warning indicators detected in this assessment.
+        </div>
+      </div>
+
+      <!-- Mandatory Prominent Medical Disclaimer -->
+      <div style="background: rgba(10, 16, 28, 0.9); border: 1px dashed var(--panel-border-bright); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; text-align: center; font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+        <strong>⚠️ IMPORTANT MEDICAL DISCLAIMER:</strong> This score is an experimental prototype indicator based on observable assessment signals. It is not a medical diagnosis or a validated probability of stroke. If sudden stroke warning signs are present, seek emergency medical care immediately regardless of the score.
       </div>
 
       <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
@@ -1476,19 +1505,63 @@
           clearInterval(phaseTimerInterval);
 
           const speechRisk = Math.max(0, 100 - speechMatchScore);
-          const overallRisk = Math.round((finalFaceScore * 0.45) + (finalArmScore * 0.40) + (speechRisk * 0.15));
+          // Observable Warning Indicator Score is calculated strictly from physical assessment signals
+          const observableScore = Math.round((finalFaceScore * 0.45) + (finalArmScore * 0.40) + (speechRisk * 0.15));
 
-          // Populate Patient Identifier & Dedicated Results Page Card
+          const rf = activeUserSession.riskFactors || {};
+
+          // Populate Patient Identifier & Observable Scores
           document.getElementById('res-user-name').innerText = activeUserSession.name || 'Patient';
           document.getElementById('res-user-age').innerText = activeUserSession.age ? `${activeUserSession.age} yrs` : '--';
 
           document.getElementById('res-face-val').innerText = `${finalFaceScore}%`;
           document.getElementById('res-arm-val').innerText = `${finalArmScore}%`;
           document.getElementById('res-speech-val').innerText = `${speechMatchScore}% match`;
-          document.getElementById('res-overall-score-val').innerText = `${overallRisk}%`;
+          document.getElementById('res-overall-score-val').innerText = `${observableScore}%`;
 
-          // Render Risk Factor Questionnaire Summary section
-          const rf = activeUserSession.riskFactors || {};
+          // B.E. FAST Symptom Override Evaluation
+          const reportedSigns = [];
+          if (rf.balanceVision?.includes('Balance')) reportedSigns.push('✓ Balance (Sudden balance loss)');
+          if (rf.balanceVision?.includes('Vision')) reportedSigns.push('✓ Eyes (Sudden vision loss/blurriness)');
+          if (finalFaceScore >= 50) reportedSigns.push('✓ Face (Facial asymmetry detected)');
+          if (finalArmScore >= 50) reportedSigns.push('✓ Arm (Arm elevation drift detected)');
+          if (speechMatchScore < 50) reportedSigns.push('✓ Speech (Speech difficulty detected)');
+
+          const isBeFastOverride = reportedSigns.length > 0;
+          const befastBanner = document.getElementById('befast-override-banner');
+          const befastSummaryLine = document.getElementById('befast-override-summary-line');
+
+          if (isBeFastOverride && befastBanner) {
+            befastBanner.style.display = 'block';
+            if (befastSummaryLine) {
+              befastSummaryLine.innerText = `Reported / Detected Warning Signs: ${reportedSigns.join(' | ')}`;
+            }
+          } else if (befastBanner) {
+            befastBanner.style.display = 'none';
+          }
+
+          // Populate B.E. FAST Symptoms Checklist Grid
+          const checklistContainer = document.getElementById('res-befast-checklist-container');
+          if (checklistContainer) {
+            const items = [
+              { label: 'B — Balance Loss', present: !!rf.balanceVision?.includes('Balance') },
+              { label: 'E — Eye/Vision Changes', present: !!rf.balanceVision?.includes('Vision') },
+              { label: 'F — Face Drooping', present: finalFaceScore >= 40 },
+              { label: 'A — Arm Weakness', present: finalArmScore >= 40 },
+              { label: 'S — Speech Difficulty', present: speechMatchScore < 60 }
+            ];
+
+            checklistContainer.innerHTML = items.map(item => `
+              <div style="background: rgba(14,21,35,0.7); padding: 10px 12px; border-radius: 8px; border: 1px solid ${item.present ? 'var(--crimson-danger)' : 'var(--panel-border)'}; display: flex; align-items: center; justify-content: space-between;">
+                <strong style="color: #fff;">${item.label}</strong>
+                <span style="font-family: var(--font-mono); font-weight: 800; color: ${item.present ? 'var(--crimson-danger)' : 'var(--emerald-ok)'};">
+                  ${item.present ? '✓ REPORTED/DETECTED' : '✗ NORMAL'}
+                </span>
+              </div>
+            `).join('');
+          }
+
+          // Populate Background Risk-Factor Summary section
           const rfSummaryContainer = document.getElementById('res-risk-factors-summary');
           if (rfSummaryContainer) {
             let bmiCategory = '';
@@ -1530,31 +1603,55 @@
             `;
           }
 
+          // 4-Tier UI Prototype Threshold Ranges & Exact Text Formatting
           const label = document.getElementById('res-overall-category-label');
-          if (overallRisk < 50) {
-            label.innerText = "🟢 Low Risk — Normal Assessment Result";
+          const guidance = document.getElementById('res-overall-guidance-text');
+          const overallBox = document.getElementById('res-overall-card-box');
+          const overallScoreVal = document.getElementById('res-overall-score-val');
+
+          if (observableScore < 30) {
+            label.innerText = "Low warning indicators detected";
+            guidance.innerText = "No significant warning indicators detected in this assessment.";
             label.style.color = "var(--emerald-ok)";
-          } else if (overallRisk < 75) {
-            label.innerText = "🟡 Elevated Risk — Monitoring Recommended";
+            overallScoreVal.style.color = "var(--emerald-ok)";
+            if (overallBox) overallBox.style.borderColor = "var(--emerald-ok)";
+          } else if (observableScore < 60) {
+            label.innerText = "Moderate warning indicators";
+            guidance.innerText = "Some warning indicators were detected. Review the individual assessment results and consider appropriate medical advice if symptoms are present.";
             label.style.color = "var(--amber-warn)";
+            overallScoreVal.style.color = "var(--amber-warn)";
+            if (overallBox) overallBox.style.borderColor = "var(--amber-warn)";
+          } else if (observableScore < 90) {
+            label.innerText = "High warning indicators detected";
+            guidance.innerText = "Strong warning indicators were detected during this assessment. If these symptoms are sudden or currently occurring, seek urgent medical evaluation.";
+            label.style.color = "#f97316";
+            overallScoreVal.style.color = "#f97316";
+            if (overallBox) overallBox.style.borderColor = "#f97316";
           } else {
-            label.innerText = "🚨 High Risk — Urgent Emergency Attention Recommended";
+            label.innerText = "Very high warning indicators detected";
+            guidance.innerText = "Multiple strong warning indicators have been detected. If these symptoms are sudden or currently occurring, treat this as an emergency and seek immediate medical assistance.";
             label.style.color = "var(--crimson-danger)";
+            overallScoreVal.style.color = "var(--crimson-danger)";
+            if (overallBox) overallBox.style.borderColor = "var(--crimson-danger)";
           }
 
           document.getElementById('results-page-card').style.display = 'block';
-          document.getElementById('final-detected-percent').innerText = `${overallRisk}%`;
+          document.getElementById('final-detected-percent').innerText = `${observableScore}%`;
           document.getElementById('phase-timer-display').innerText = "DONE";
           updateStepTrackerUI(4);
           updatePhaseBannerUI();
 
           if (window.VoiceGuide) {
-            VoiceGuide.speak(`Assessment complete. AI-assisted stroke risk indicator is ${overallRisk} percent.`);
+            VoiceGuide.speak(`Assessment complete. NeuroWatch Warning Indicator Score is ${observableScore} percent.`);
           }
 
-          if (overallRisk >= 50) {
+          // Trigger emergency response if score >= 90% OR B.E. FAST symptom override is active
+          if (observableScore >= 90 || isBeFastOverride) {
             updateStepTrackerUI(5);
-            trigger_emergency_response(`Automated Assessment Complete (${overallRisk}% Stroke Risk)`, overallRisk);
+            const triggerReason = isBeFastOverride
+              ? `Emergency B.E. FAST Symptom Reported (${reportedSigns.join(', ')})`
+              : `Automated Assessment Confirmed Very High Risk (${observableScore}%)`;
+            trigger_emergency_response(triggerReason, Math.max(observableScore, 90));
           }
         }
       }
